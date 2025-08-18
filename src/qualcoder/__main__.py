@@ -1383,13 +1383,15 @@ Click "Yes" to start now.')
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
         # AI menu
-        self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
-        self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
-        self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
-        self.ui.actionAI_Edit_Project_Memo.triggered.connect(self.project_memo)
-        self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
-        self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
-        self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
+        # AI_CHAT_DISABLED (Aug 2025)
+        # Reason: Prevent using AI Chat functionality.
+        # self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
+        # self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
+        # self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
+        # self.ui.actionAI_Edit_Project_Memo.triggered.connect(self.project_memo)
+        # self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
+        # # self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
+        # self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
@@ -1404,7 +1406,9 @@ Click "Yes" to start now.')
         self.settings_report()
         
         self.ui.tabWidget.setCurrentIndex(0)
-        self.ai_chat()
+        # AI_CHAT_DISABLED (Aug 2025)
+        # Reason: Prevent using AI Chat init.
+        # self.ai_chat()
         # add tab widget icons
         try:
             self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.cog', color=self.app.highlight_color()))  # Action Log
@@ -2788,8 +2792,10 @@ Click "Yes" to start now.')
         self.app.conn.commit()
         
         # AI: init llm and update vectorstore
-        self.app.ai.init_llm(self)
-        self.ai_chat_window.init_ai_chat(self.app)
+        # AI_CHAT_DISABLED (Aug 2025)
+        # Reason: Disabled AI initialization.
+        # self.app.ai.init_llm(self)
+        # self.ai_chat_window.init_ai_chat(self.app)
         
         # Fix missing folders within QualCoder project. Will cause import errors.
         span = '<span style="color:red">'
@@ -2914,8 +2920,10 @@ Click "Yes" to start now.')
             self.ui.textEdit.append("========\n")
             self.app.append_recent_project(self.app.project_path)
         # AI
-        self.ai_chat_window.close()
-        self.app.ai.close()
+        # AI_CHAT_DISABLED (Aug 2025)
+        # Reason: Disabled AI Chat shutdown cleanup.
+        # self.ai_chat_window.close()
+        # self.app.ai.close()
         
         if self.app.conn is not None:
             try:
@@ -3031,7 +3039,9 @@ Click "Yes" to start now.')
             msg = _('Please enable the AI first and set it up in Settings.')
             Message(self.app, _('Ai Chat'), msg).exec() 
             return
-        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
+        # AI_CHAT_DISABLED (Aug 2025)
+        # Reason: Disabled automatic tab switching to AI Chat.
+        # self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
 
     def ai_go_search(self):
         """ Action triggered by AI Search and Coding menu item."""
