@@ -1361,7 +1361,8 @@ class ViewCharts(QDialog):
                         labels=dict(x=heatmap_type, y="Codes", color="Count"),
                         x=x_labels,
                         y=y_labels,
-                        title=title + subtitle
+                        title=title + subtitle,
+                        text_auto=True #this adds numbers on the boxes
                         )
         fig.update_xaxes(side="top")
         fig.show()
