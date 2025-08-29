@@ -1411,10 +1411,10 @@ Click "Yes" to start now.')
         # self.ai_chat()
         # add tab widget icons
         try:
-            self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.cog', color=self.app.highlight_color()))  # Action Log
-            self.ui.tabWidget.setTabIcon(1, qta.icon('mdi6.file-outline', color=self.app.highlight_color()))  # Manage
-            self.ui.tabWidget.setTabIcon(2, qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color()))  # Coding
-            self.ui.tabWidget.setTabIcon(3, qta.icon('mdi6.format-list-group', color=self.app.highlight_color()))  # Reports
+            self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.clipboard-file', color=self.app.highlight_color()))  # Action Log
+            self.ui.tabWidget.setTabIcon(1, qta.icon('mdi6.folder-cog-outline', color=self.app.highlight_color()))  # Manage
+            self.ui.tabWidget.setTabIcon(2, qta.icon('mdi6.bookmark-outline', color=self.app.highlight_color()))  # Coding
+            self.ui.tabWidget.setTabIcon(3, qta.icon('mdi6.view-list-outline', color=self.app.highlight_color()))  # Reports
             self.ui.tabWidget.setTabIcon(4, qta.icon('mdi6.message-processing-outline', color=self.app.highlight_color()))  # Ai Chat
         except Exception as e_:
             logger.log(e_)
