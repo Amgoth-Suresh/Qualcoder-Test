@@ -97,7 +97,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.pushButton_runSQL.clicked.connect(self.run_sql)
         self.ui.pushButton_csv.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_csv.clicked.connect(self.export_csv_file)
-        self.ui.pushButton_excel.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_excel.setIcon(qta.icon('mdi6.microsoft-excel', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_excel.clicked.connect(self.export_excel_file)
 
         self.ui.splitter.setSizes([20, 180])

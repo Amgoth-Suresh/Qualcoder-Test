@@ -67,7 +67,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.checkBox_any_matches.setChecked(True)
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.microsoft-excel', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
         self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.excluded_icon = qta.icon('mdi6.window-close')

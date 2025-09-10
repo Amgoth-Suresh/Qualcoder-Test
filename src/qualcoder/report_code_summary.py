@@ -73,7 +73,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
-        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.magnify',options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)

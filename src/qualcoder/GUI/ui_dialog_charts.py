@@ -301,7 +301,7 @@ class Ui_DialogCharts(object):
         self.radioButton_file.setText(_translate("DialogCharts", "File"))
         self.radioButton_case.setText(_translate("DialogCharts", "Case"))
         self.checkBox_export_html.setText(_translate("DialogCharts", "Export HTML file"))
-        self.label_chart_options_2.setText(_translate("DialogCharts", "<b>Heatmap charts</b>"))
+        self.label_chart_options_2.setText(_translate("DialogCharts", "<b>Matrix View</b>"))#Changed from Heatmap Charts to Matrix View
         self.label_word_clouds.setText(_translate("DialogCharts", "Word cloud"))
         self.comboBox_wordcloud_background.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Background</p></body></html>"))
         self.comboBox_wordcloud_foreground.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Foreground</p></body></html>"))

@@ -167,7 +167,7 @@ class Ui_Dialog_CodeRelations(object):
         self.pushButton_search_next.setToolTip(_translate("Dialog_CodeRelations", "Search for next occurence in results"))
         self.pushButton_export_exact.setToolTip(_translate("Dialog_CodeRelations", "Export Excel report of exact text coding matches for all  files.\n"
 "Ordered by file name and code name."))
-        self.pushButton_export_exact.setText(_translate("Dialog_CodeRelations", "E"))
+        #self.pushButton_export_exact.setText(_translate("Dialog_CodeRelations", "E"))
         self.pushButton_file_attributes.setToolTip(_translate("Dialog_CodeRelations", "Select text files by attributes"))
         self.label_codes.setText(_translate("Dialog_CodeRelations", "Codes:"))
         self.label_summary_stats.setText(_translate("Dialog_CodeRelations", "Summary statistics"))
