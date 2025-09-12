@@ -1277,7 +1277,7 @@ class ViewCharts(QDialog):
         heatmap_type = self.ui.comboBox_heatmap.currentText()
         if heatmap_type == "":
             return
-        title = heatmap_type + " " + _("Heatmap")
+        title = heatmap_type + " " + _("Matrix View")
         self.get_selected_categories_and_codes()
         y_labels = []
         for c in codes:
