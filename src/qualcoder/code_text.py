@@ -227,7 +227,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-long'))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         # Buttons under codes tree
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
@@ -556,23 +556,23 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 

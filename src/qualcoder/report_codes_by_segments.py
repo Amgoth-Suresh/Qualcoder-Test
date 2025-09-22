@@ -198,22 +198,22 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         if not ok:
             self.attributes = temp_attributes
             self.ui.pushButton_file_attributes.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes selected
             self.ui.pushButton_file_attributes.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.attributes = []
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
             self.ui.pushButton_file_attributes.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
 

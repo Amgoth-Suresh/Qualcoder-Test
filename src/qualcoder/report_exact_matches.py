@@ -69,7 +69,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.microsoft-excel', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
-        self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.excluded_icon = qta.icon('mdi6.window-close')
         self.get_data()
 
@@ -179,25 +179,25 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         if not ok:
             self.attributes = temp_attributes
             self.ui.pushButton_file_filter.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
             self.ui.pushButton_file_filter.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
             self.get_files_fill_list_widget()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
             self.ui.pushButton_file_filter.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
             return
-        self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_filter.setToolTip(ui.tooltip_msg)
 
         for i in range(self.ui.listWidget_files.count()):

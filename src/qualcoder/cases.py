@@ -80,7 +80,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.pushButton_import_cases.setIcon(qta.icon('mdi6.file-import-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)

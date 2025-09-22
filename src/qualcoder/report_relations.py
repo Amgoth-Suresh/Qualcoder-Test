@@ -95,7 +95,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_boxplots.pressed.connect(self.create_boxplots)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.magnify',options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_search_next.clicked.connect(self.search_text)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -141,7 +141,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 self.files = all_files[1:]
                 self.ui.pushButton_select_files.setToolTip(_("All files selected"))
                 self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
                 self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
                 self.attributes = []
                 return
@@ -151,7 +151,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             tt += "\n" + s['name']
         self.ui.pushButton_select_files.setToolTip(tt)
         self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
         self.attributes = []
 
@@ -176,23 +176,23 @@ class DialogReportRelations(QtWidgets.QDialog):
         if not ok:
             self.attributes = temp_attributes
             self.ui.pushButton_file_attributes.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
                 self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes selected
             self.ui.pushButton_file_attributes.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.attributes = []
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
             self.ui.pushButton_file_attributes.setIcon(
-                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
 
@@ -210,7 +210,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
         Message(self.app, _("Files selected by attributes"), msg).exec()
 
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(msg)
         self.ui.pushButton_select_files.setToolTip(_("Select files"))
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))

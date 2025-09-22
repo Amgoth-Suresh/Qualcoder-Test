@@ -60,7 +60,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.fill_table_widget()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.pushButton_add.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_add.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
         self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)

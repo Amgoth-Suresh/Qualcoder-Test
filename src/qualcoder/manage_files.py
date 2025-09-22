@@ -123,7 +123,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.clicked.connect(self.export)
-        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.pushButton_export_attributes.setIcon(qta.icon('mdi6.file-export-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
