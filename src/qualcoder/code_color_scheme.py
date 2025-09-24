@@ -269,7 +269,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
         # Update code perspective color for filling tree background
         for c in self.codes:
-            color_index = colors.index(c['color'])
+            try:
+                color_index = colors.index(c['color'])
+            except ValueError:
+                color_index = 0  # fallback if color not in list 
             if self.perspective_idx == 0:
                 c['perspective'] = colors[color_index]
             if self.perspective_idx == 1:
