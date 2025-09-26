@@ -89,7 +89,7 @@ class Ui_DialogMatchingTextSegments(object):
         self.listWidget_files.setObjectName("listWidget_files")
         self.treeWidget = QtWidgets.QTreeWidget(parent=self.splitter_vert)
         self.treeWidget.setObjectName("treeWidget")
-        self.treeWidget.headerItem().setText(0, "Code Tree")
+        self.treeWidget.headerItem().setText(0, "Label Tree")
         self.tableWidget = QtWidgets.QTableWidget(parent=self.splitter)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)

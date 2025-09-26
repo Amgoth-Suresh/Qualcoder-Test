@@ -1128,7 +1128,7 @@ msgid "Category name"
 msgstr ""
 
 #: qualcoder\code_organiser.py:153 qualcoder\view_graph.py:152
-msgid "Select code tree branch"
+msgid "Select Label Tree branch"
 msgstr ""
 
 #: qualcoder\code_organiser.py:166
@@ -1145,7 +1145,7 @@ msgid "Image exported"
 msgstr ""
 
 #: qualcoder\code_organiser.py:586
-msgid "Code tree re-organised."
+msgid "Label Tree re-organised."
 msgstr ""
 
 #: qualcoder\code_organiser.py:932
@@ -3455,7 +3455,7 @@ msgstr ""
 #: qualcoder\reports.py:276 qualcoder\reports.py:321 qualcoder\reports.py:688
 #: qualcoder\report_compare_coder_file.py:723
 #: qualcoder\report_exact_matches.py:501 qualcoder\report_relations.py:991
-msgid "Code Tree"
+msgid "Label Tree"
 msgstr ""
 
 #: qualcoder\reports.py:309
@@ -3864,7 +3864,7 @@ msgstr ""
 #: qualcoder\report_codes.py:1264 qualcoder\report_codes.py:1270
 #: qualcoder\report_relations.py:165 qualcoder\report_relations.py:166
 #: qualcoder\__main__.py:2711
-msgid "Codes: "
+msgid "Labels: "
 msgstr ""
 
 #: qualcoder\report_codes.py:1276

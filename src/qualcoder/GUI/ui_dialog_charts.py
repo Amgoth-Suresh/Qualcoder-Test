@@ -293,7 +293,7 @@ class Ui_DialogCharts(object):
         self.label_filter.setText(_translate("DialogCharts", "Filter out values below:"))
         self.lineEdit_filter.setToolTip(_translate("DialogCharts", "Enter number for filter cut off"))
         self.label_filters.setText(_translate("DialogCharts", "<b>Data filters</b>"))
-        self.label_chart_options.setText(_translate("DialogCharts", "<b>Coding charts</b>"))
+        self.label_chart_options.setText(_translate("DialogCharts", "<b>Labeling charts</b>"))
         self.label_category.setText(_translate("DialogCharts", "Select category"))
         self.label_chart_attributes.setText(_translate("DialogCharts", "<b>Attribute charts</b>"))
         self.label_num_attr.setText(_translate("DialogCharts", "Numeric attributes"))

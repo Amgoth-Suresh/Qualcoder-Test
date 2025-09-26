@@ -162,7 +162,7 @@ def color_matcher(hex_color):
 
 
 def show_codes_of_colour_range(app, code_tree, codes, selected_color):
-    """ Show all codes in colour range in code tree., ir all codes if no selection.
+    """ Show all codes in colour range in Label Tree., ir all codes if no selection.
     Show selected codes that are of a selected colour.
     """
 

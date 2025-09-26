@@ -146,7 +146,7 @@ class Ui_Dialog_CodeRelations(object):
     def retranslateUi(self, Dialog_CodeRelations):
         _translate = QtCore.QCoreApplication.translate
         Dialog_CodeRelations.setWindowTitle(_translate("Dialog_CodeRelations", "Code relations"))
-        self.label_header.setText(_translate("Dialog_CodeRelations", "Relations between codes in text files."))
+        self.label_header.setText(_translate("Dialog_CodeRelations", "Relations between labels in text files."))
         self.pushButton_exportcsv.setToolTip(_translate("Dialog_CodeRelations", "Export csv file"))
         self.pushButton_calculate.setToolTip(_translate("Dialog_CodeRelations", "Calculate"))
         self.radioButton_this.setText(_translate("Dialog_CodeRelations", "This coder"))
@@ -169,7 +169,7 @@ class Ui_Dialog_CodeRelations(object):
 "Ordered by file name and code name."))
         #self.pushButton_export_exact.setText(_translate("Dialog_CodeRelations", "E"))
         self.pushButton_file_attributes.setToolTip(_translate("Dialog_CodeRelations", "Select text files by attributes"))
-        self.label_codes.setText(_translate("Dialog_CodeRelations", "Codes:"))
+        self.label_codes.setText(_translate("Dialog_CodeRelations", "Labels:"))
         self.label_summary_stats.setText(_translate("Dialog_CodeRelations", "Summary statistics"))
 
 

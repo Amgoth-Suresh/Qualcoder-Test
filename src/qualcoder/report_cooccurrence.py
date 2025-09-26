@@ -389,7 +389,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
                     13 - 16 r['text_before'], r['text_overlap'], r['text_after'], r['relation']]
                     '''
-                    details += f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
+                    details += f"Labels: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
                     details += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
                     details += f"File (fid {data[6]}): {data[7]}\n"
                     details += f"{data[13]}[[{data[14]}]]{data[15]}\n========\n"
@@ -450,7 +450,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         brush_green = QtGui.QBrush(QtGui.QColor(color_green))
 
         for data in data_list:
-            msg = f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
+            msg = f"Labels: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
             msg += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
             msg += f"File (fid {data[6]}): {data[7]}\n"
             # msg += f"\nrelation: {data[16]}\n"  # testing

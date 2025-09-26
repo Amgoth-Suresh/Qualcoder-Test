@@ -95,7 +95,7 @@ Per i calcoli vengono utilizzati i codici dell&apos;intero file di testo.</trans
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>Codifica dei grafici</translation>
     </message>
     <message>
@@ -771,7 +771,7 @@ en-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>Relazioni tra i codici nei file di testo</translation>
     </message>
     <message>
@@ -796,7 +796,7 @@ en-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
+        <source>Labels:</source>
         <translation>Codici: </translation>
     </message>
     <message>
@@ -2235,7 +2235,7 @@ Cheatsheet Regex: www.rexegg.com/regex-quickstart.html</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>Rapporto di sommario del codice</translation>
     </message>
     <message>
@@ -4887,7 +4887,7 @@ Non codificate questo testo finché non ricaricate Codifica - Testo codificato d
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>Esporta libro dei codici</translation>
     </message>
     <message>

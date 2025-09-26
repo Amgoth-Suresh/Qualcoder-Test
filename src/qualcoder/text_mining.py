@@ -298,7 +298,7 @@ class DialogTextMining(QtWidgets.QDialog):
             if i.text(1)[0:3] == 'cid':
                 code_ids.append(i.text(1)[4:])
                 code_txt.append(i.text(0))
-        txt += "Codes: " + ",".join(code_txt)
+        txt += "Labels: " + ",".join(code_txt)
 
         # files or cases
         case_or_file_text = []

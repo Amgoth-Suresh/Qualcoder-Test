@@ -1435,7 +1435,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.recursive_traverse(root, text_)
 
     def show_codes_of_color(self):
-        """ Show all codes in colour range in code tree., ir all codes if no selection.
+        """ Show all codes in colour range in Label Tree., ir all codes if no selection.
         Show selected codes that are of a selected colour.
         """
 
@@ -1786,7 +1786,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """
 
         if object_ is self.ui.treeWidget.viewport():
-            '''# If a show selected code was active, then clicking on a code in code tree, shows all codes and all tooltips
+            '''# If a show selected code was active, then clicking on a code in Label Tree, shows all codes and all tooltips
             if event.type() == QtCore.QEvent.Type.MouseButtonPress:
                 self.show_all_codes_in_text()'''
             if event.type() == QtCore.QEvent.Type.Drop:
@@ -1804,7 +1804,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
-            # timer sensitivity is reduced compared to Code_text as scene redraw adds time.
+            # timer sensitivity is reduced compared to code_text as scene redraw adds time.
             if diff.microseconds < 10000:
                 return False
 

@@ -95,7 +95,7 @@ Codings from the entire text file are used for the calculations.</source>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>编码图表</translation>
     </message>
     <message>
@@ -660,7 +660,7 @@ Checked - any selected codes must match exactly.</source>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>文本文件中代码之间的关系</translation>
     </message>
     <message>
@@ -766,7 +766,7 @@ Checked - any selected codes must match exactly.</source>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
+        <source>Labels:</source>
         <translation>代码：</translation>
     </message>
     <message>
@@ -1797,7 +1797,7 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>代码摘要报告</translation>
     </message>
 </context>
@@ -4000,7 +4000,7 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>编码报告</translation>
     </message>
     <message>

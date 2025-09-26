@@ -56,7 +56,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Relations between codes in text files.</string>
+       <string>Relations between labels in text files.</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -311,7 +311,7 @@ Ordered by file name and code name.</string>
       </size>
      </property>
      <property name="text">
-      <string>Codes:</string>
+      <string>Labels:</string>
      </property>
      <property name="scaledContents">
       <bool>true</bool>

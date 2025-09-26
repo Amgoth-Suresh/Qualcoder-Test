@@ -316,7 +316,7 @@
   </action>
   <action name="actionCoding_reports">
    <property name="text">
-    <string>Coding reports</string>
+    <string>Labeling reports</string>
    </property>
   </action>
   <action name="actionCoding_summary">

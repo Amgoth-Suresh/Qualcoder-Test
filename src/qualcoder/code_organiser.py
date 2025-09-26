@@ -143,7 +143,7 @@ class CodeOrganiser(QDialog):
             # Use top level categories only
             if category['supercatid'] is None:
                 selection_list.append({'name': category['name']})
-        ui = DialogSelectItems(self.app, selection_list, _("Select code tree branch"), "multi")
+        ui = DialogSelectItems(self.app, selection_list, _("Select Label Tree branch"), "multi")
         ok = ui.exec()
         if not ok:
             return
@@ -576,7 +576,7 @@ class CodeOrganiser(QDialog):
                 self.update_merged_coded_segments(item['original_cid'], item['cid'])
         # Wrap up
         self.app.delete_backup = False
-        self.parent_text_edit.append(_("Code tree re-organised."))
+        self.parent_text_edit.append(_("Label Tree re-organised."))
         self.hide()
         Message(self.app, "Code organiser", "Changes applied to the codes tree").exec()
 

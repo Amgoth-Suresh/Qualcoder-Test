@@ -95,7 +95,7 @@ Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>&amp;lt;b&amp;gt;Graphiques de codage&amp;lt;/b&amp;gt;</translation>
     </message>
     <message>
@@ -771,7 +771,7 @@ en-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>Relations entre les codes dans les fichiers texte.</translation>
     </message>
     <message>
@@ -796,8 +796,8 @@ en-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
-        <translation>Codes:</translation>
+        <source>Labels:</source>
+        <translation>Labels:</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
@@ -2267,7 +2267,7 @@ Un menu d&apos;options s&apos;ouvre alors.</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>Rapport de sommaire des codes</translation>
     </message>
     <message>
@@ -4924,7 +4924,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Texte de code dans l
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>Rapports de codage</translation>
     </message>
     <message>

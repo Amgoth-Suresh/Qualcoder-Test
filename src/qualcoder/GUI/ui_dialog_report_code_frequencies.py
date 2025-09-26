@@ -79,8 +79,8 @@ class Ui_Dialog_reportCodeFrequencies(object):
 
     def retranslateUi(self, Dialog_reportCodeFrequencies):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_reportCodeFrequencies.setWindowTitle(_translate("Dialog_reportCodeFrequencies", "Code frequencies"))
-        self.label_selections.setText(_translate("Dialog_reportCodeFrequencies", "Code and category frequencies: overall and by coder"))
+        Dialog_reportCodeFrequencies.setWindowTitle(_translate("Dialog_reportCodeFrequencies", "Label frequencies"))
+        self.label_selections.setText(_translate("Dialog_reportCodeFrequencies", "Labels and category frequencies: overall and by coder"))
         self.pushButton_exporttext.setToolTip(_translate("Dialog_reportCodeFrequencies", "Export text file"))
         self.pushButton_export_excel.setToolTip(_translate("Dialog_reportCodeFrequencies", "Export Excel"))
         self.pushButton_select_files.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Select files</p></body></html>"))

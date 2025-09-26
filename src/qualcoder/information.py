@@ -183,7 +183,7 @@ menu_shortcuts = '<h1>Menu key shortcuts</h1>\n\
 <tr><td><br/></td><td>Ctrl Q Exit</td><td>Ctrl I Import survey</td></tr>\n\
 </table><br/><table>\n\
 <tr><td><b>Coding menu shortcuts</b></td><td><b>Reports menu shortcuts</b></td><td><b>Help menu shortcuts</b></td></tr>\n\
-<tr><td>Alt T Code text</td><td>Alt K Coding reports</td><td>Alt H Contents - in web browser</td></tr>\n\
+<tr><td>Alt T Code text</td><td>Alt K Labeling reports</td><td>Alt H Contents - in web browser</td></tr>\n\
 <tr><td>Alt I Code image</td><td>Alt L Coding comparison</td><td>Alt Y About</td></tr>\n\
 <tr><td>Alt V Code audio/video</td><td>Alt M Coding comparison by file</td><td>Alt Z Special functions</td></tr>\n\
 <tr><td>Alt E Colour scheme</td><td>Alt N Code frequencies</td><td></td></tr>\n\

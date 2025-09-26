@@ -95,7 +95,7 @@ Codings from the entire text file are used for the calculations.</source>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>コーディング・チャート</translation>
     </message>
     <message>
@@ -657,7 +657,7 @@ Checked - any selected codes must match exactly.</source>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>テキストファイルのコード間の関係。</translation>
     </message>
     <message>
@@ -762,7 +762,7 @@ Checked - any selected codes must match exactly.</source>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
+        <source>Labels:</source>
         <translation>コード：</translation>
     </message>
     <message>
@@ -1786,7 +1786,7 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>コード・サマリー・レポート</translation>
     </message>
 </context>
@@ -3978,7 +3978,7 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>コーディング・レポート</translation>
     </message>
     <message>

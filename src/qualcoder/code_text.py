@@ -1844,7 +1844,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recursive_traverse(root, text_)
 
     def show_codes_of_color(self):
-        """ Show all codes in colour range in code tree., ir all codes if no selection.
+        """ Show all codes in colour range in Label Tree., ir all codes if no selection.
         Show selected codes that are of a selected colour.
         """
 
@@ -2237,7 +2237,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         if object_ is self.ui.treeWidget.viewport():
-            # If a show selected code was active, then clicking on a code in code tree, shows all codes and all tooltips
+            # If a show selected code was active, then clicking on a code in Label Tree, shows all codes and all tooltips
             if event.type() == QtCore.QEvent.Type.MouseButtonPress:
                 self.show_all_codes_in_text()
             if event.type() == QtCore.QEvent.Type.Drop:
@@ -4023,7 +4023,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                     + _("\nUsing line ending: ")
                                     + ending + "\n" + msg)
         self.app.delete_backup = False
-        # Update tooltip filter and code tree code counts
+        # Update tooltip filter and Label Tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
@@ -4152,7 +4152,7 @@ class DialogCodeText(QtWidgets.QWidget):
             name += _("\nWith: ") + find_text
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
-        # Update tooltip filter and code tree code counts
+        # Update tooltip filter and Label Tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
@@ -4168,7 +4168,7 @@ class DialogCodeText(QtWidgets.QWidget):
                        [self.edit_original_source, self.edit_original_source_id])
         # print("source id:", self.edit_original_source_id)
         # print("Source: ", self.edit_original_source)
-        # print("Codes:", self.edit_original_codes)
+        # print("Labels:", self.edit_original_codes)
         for c in self.edit_original_codes:
             cursor.execute("update code_text set seltext=?, pos0=?, pos1=? where ctid=?",
                            [c[1], c[2], c[3], c[0]])
@@ -4834,7 +4834,7 @@ class DialogCodeText(QtWidgets.QWidget):
             Message(self.app, _('AI Search'), msg, "warning").exec()
             return
 
-        # Get currently selected item in code tree
+        # Get currently selected item in Label Tree
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None:  # nothing selected
             selected_id = -1

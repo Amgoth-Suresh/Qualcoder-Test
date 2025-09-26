@@ -95,7 +95,7 @@ Kodningar från hela textfilen används för beräkningarna.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>&lt;b&gt;Kodningsdiagram&lt;/b&gt;</translation>
     </message>
     <message>
@@ -658,7 +658,7 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>Relationer mellan koder i textfiler.</translation>
     </message>
     <message>
@@ -763,7 +763,7 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
+        <source>Labels:</source>
         <translation>Koder:</translation>
     </message>
     <message>
@@ -1786,7 +1786,7 @@ Därefter öppnas en meny med alternativ</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>Kodöversiktsrapport</translation>
     </message>
 </context>
@@ -3975,7 +3975,7 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>Kodrapporter</translation>
     </message>
     <message>

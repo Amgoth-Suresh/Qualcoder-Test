@@ -187,7 +187,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Coding report</string>
+       <string>Labeling report</string>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_matrix">
@@ -466,7 +466,7 @@
          <widget class="QTreeWidget" name="treeWidget">
           <column>
            <property name="text">
-            <string notr="true">Code Tree</string>
+            <string notr="true">Label Tree</string>
            </property>
           </column>
          </widget>

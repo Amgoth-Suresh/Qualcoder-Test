@@ -536,7 +536,7 @@ msgstr "Kodkategorier: "
 #: report_codes.py:1301 report_codes.py:1307 report_relations.py:243
 #: report_relations.py:244 __main__.py:2867 report_codes.py:1302
 #: report_codes.py:1308 __main__.py:2823
-msgid "Codes: "
+msgid "Labels: "
 msgstr "Koder: "
 
 #: __main__.py:2769 attributes.py:92 attributes.py:257 view_charts.py:259
@@ -1837,7 +1837,7 @@ msgid "Category name"
 msgstr "Kategorinamn"
 
 #: code_organiser.py:146 view_graph.py:153 view_graph.py:160
-msgid "Select code tree branch"
+msgid "Select Label Tree branch"
 msgstr "Välj gren i kodträd"
 
 #: code_organiser.py:159
@@ -1854,7 +1854,7 @@ msgid "Image exported"
 msgstr "Bild exporterad"
 
 #: code_organiser.py:579
-msgid "Code tree re-organised."
+msgid "Label Tree re-organised."
 msgstr "Kodträdet har organiserats om."
 
 #: code_organiser.py:925
@@ -5253,7 +5253,7 @@ msgstr "Totalt text oenighet (enkelt kodad): "
 #: report_relations.py:1012 reports.py:276 reports.py:330 reports.py:746
 #: report_compare_coder_file.py:739 report_exact_matches.py:564
 #: report_relations.py:1102 reports.py:347 reports.py:413 reports.py:853
-msgid "Code Tree"
+msgid "Label Tree"
 msgstr "Kodträd"
 
 #: report_compare_coder_file.py:880 report_file_summary.py:364

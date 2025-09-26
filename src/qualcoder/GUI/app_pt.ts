@@ -95,7 +95,7 @@ As codificações de todo o arquivo de texto são utilizadas para os cálculos.<
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>Gráficos de codificação</translation>
     </message>
     <message>
@@ -772,7 +772,7 @@ pt-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>Relações entre códigos em arquivos de texto.</translation>
     </message>
     <message>
@@ -797,7 +797,7 @@ pt-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
+        <source>Labels:</source>
         <translation>Códigos:</translation>
     </message>
     <message>
@@ -2144,7 +2144,7 @@ Em seguida, abre-se um menu de opções.</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>Relatório de resumo do código</translation>
     </message>
     <message>
@@ -4579,7 +4579,7 @@ Não codifique este texto até que você recarregue Codificação - Texto do có
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>Relatórios de codificação</translation>
     </message>
     <message>

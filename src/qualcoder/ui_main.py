@@ -333,7 +333,7 @@ class Ui_MainWindow(object):
         self.actionAssign_Attributes.setText(_translate("MainWindow", "Assign Attributes"))
         self.actionManage_Attributes.setText(_translate("MainWindow", "Manage Attributes"))
         self.actionImport_Attributes.setText(_translate("MainWindow", "Import Attributes"))
-        self.actionCoding_reports.setText(_translate("MainWindow", "Coding reports"))
+        self.actionCoding_reports.setText(_translate("MainWindow", "Labeling reports"))
         self.actionCoding_summary.setText(_translate("MainWindow", "Coding summary"))
         self.actionSQL_statements.setText(_translate("MainWindow", "Database queries"))
         self.actionContents.setText(_translate("MainWindow", "Contents"))

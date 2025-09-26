@@ -56,7 +56,7 @@ class Ui_Dialog_AiSearch(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.treeWidget = QtWidgets.QTreeWidget(parent=self.tab_code_search)
         self.treeWidget.setObjectName("treeWidget")
-        self.treeWidget.headerItem().setText(0, "Code Tree")
+        self.treeWidget.headerItem().setText(0, "Label Tree")
         self.verticalLayout_2.addWidget(self.treeWidget)
         self.widget_3 = QtWidgets.QWidget(parent=self.tab_code_search)
         self.widget_3.setObjectName("widget_3")

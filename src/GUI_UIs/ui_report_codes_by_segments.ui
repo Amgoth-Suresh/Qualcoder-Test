@@ -115,7 +115,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Codes by text segments table. 1 = code present, 0 = not coded.</string>
+       <string>Labels by text segments table. 1 = code present, 0 = not coded.</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_export_xlsx">
@@ -189,7 +189,7 @@
           </property>
           <column>
            <property name="text">
-            <string notr="true">Code Tree</string>
+            <string notr="true">Label Tree</string>
            </property>
           </column>
          </widget>

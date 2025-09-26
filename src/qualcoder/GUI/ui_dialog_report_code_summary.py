@@ -65,7 +65,7 @@ class Ui_Dialog_code_summary(object):
         self.pushButton_search_next.setToolTip(_translate("Dialog_code_summary", "Search for next occurence in results"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_code_summary", "Search results for text"))
         self.label_search_results.setText(_translate("Dialog_code_summary", "Search:"))
-        self.label_codes.setText(_translate("Dialog_code_summary", "Code summary report"))
+        self.label_codes.setText(_translate("Dialog_code_summary", "Label summary report"))
 
 
 if __name__ == "__main__":

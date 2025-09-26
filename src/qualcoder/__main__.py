@@ -2862,7 +2862,7 @@ Click "Yes" to start now.')
         sql = "select count(cid) from code_name"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += f'{_("Codes: ")}{res[0]}\n'
+        msg += f'{_("Labels: ")}{res[0]}\n'
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
         res = cur.fetchone()

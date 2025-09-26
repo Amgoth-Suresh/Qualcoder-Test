@@ -561,7 +561,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        header = [_("Code Tree"), _("Id")]
+        header = [_("Label Tree"), _("Id")]
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)

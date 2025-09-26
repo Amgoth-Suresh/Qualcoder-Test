@@ -2052,7 +2052,7 @@ msgstr "Κατηγορίες κωδικών: "
 #: reports.py:1570 reports.py:1646 report_relations.py:136 reports.py:1558
 #: reports.py:1634 qualcoder.py:1485 reports.py:1580 reports.py:1656
 #: __main__.py:1651 report_codes.py:819 report_codes.py:968
-msgid "Codes: "
+msgid "Labels: "
 msgstr "Κωδικοί: "
 
 #: qualcoder.py:1506 qualcoder.py:1558 qualcoder.py:1540 qualcoder.py:1598
@@ -2131,7 +2131,7 @@ msgstr "Το αρχείο κειμένου συχνότητας κωδικοπο
 #: reports.py:719 report_relations.py:418 reports.py:325 reports.py:357
 #: reports.py:707 report_relations.py:403 reports.py:297 reports.py:329
 #: reports.py:662
-msgid "Code Tree"
+msgid "Label Tree"
 msgstr "Κωδικός Δέντρου"
 
 #: reports.py:356 report_relations.py:548 reports.py:354

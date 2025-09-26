@@ -273,7 +273,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 sub_cats.remove(leaf_cat)
             counter += 1
 
-        header = ["Code Tree", "Id"]
+        header = ["Label Tree", "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
@@ -344,7 +344,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     def export_excel_file(self):
         """ Export data as excel. """
 
-        header = [_("Code Tree"), "Id"]
+        header = [_("Label Tree"), "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
@@ -410,7 +410,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        header = [_("Code Tree"), "Id"]
+        header = [_("Label Tree"), "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
@@ -630,7 +630,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
         ws.cell(column=1, row=1, value=f"Coder Comparison: {self.selected_coders[0]}, {self.selected_coders[1]}")
 
-        headings = ["Code tree", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"]
+        headings = ["Label Tree", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"]
         for col, heading in enumerate(headings):
             ws.cell(column=col + 1, row=2, value=heading)
             ws.cell(column=col + 1, row=2).font = Font(b=True)
@@ -850,7 +850,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
         self.ui.treeWidget.setHeaderLabels(
-            [_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"])
+            [_("Label Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"])
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids']:
             self.ui.treeWidget.showColumn(1)

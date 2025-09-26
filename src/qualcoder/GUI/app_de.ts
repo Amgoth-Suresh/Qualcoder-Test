@@ -95,7 +95,7 @@ Für die Berechnungen werden Codierungen aus der gesamten Textdatei verwendet.</
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
-        <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
+        <source>&lt;b&gt;Labeling charts&lt;/b&gt;</source>
         <translation>&lt;b&gt;Codierungstabellen&lt;/b&gt;</translation>
     </message>
     <message>
@@ -774,7 +774,7 @@ en-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
-        <source>Relations between codes in text files.</source>
+        <source>Relations between labels in text files.</source>
         <translation>Beziehungen zwischen Codes in Textdateien.</translation>
     </message>
     <message>
@@ -799,8 +799,8 @@ en-AU</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
-        <source>Codes:</source>
-        <translation>Codes:</translation>
+        <source>Labels:</source>
+        <translation>Labels:</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
@@ -2271,7 +2271,7 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
-        <source>Code summary report</source>
+        <source>Label Summary Report</source>
         <translation>Code-Zusammenfassungsbericht</translation>
     </message>
     <message>
@@ -4908,7 +4908,7 @@ Codieren Sie diesen Text erst, wenn Sie Codieren - Text codieren aus der Menüle
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
-        <source>Coding reports</source>
+        <source>Labeling reports</source>
         <translation>Codierungsberichte</translation>
     </message>
     <message>

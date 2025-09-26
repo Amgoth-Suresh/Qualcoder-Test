@@ -5380,7 +5380,7 @@ msgstr "Disaccordo totale sul testo (codifica singola): "
 #: report_relations.py:1012 reports.py:330 reports.py:746
 #: report_compare_coder_file.py:739 report_exact_matches.py:564
 #: report_relations.py:1102 reports.py:347 reports.py:413 reports.py:853
-msgid "Code Tree"
+msgid "Label Tree"
 msgstr "Albero dei codici"
 
 #: report_compare_coder_file.py:895 report_file_summary.py:373
@@ -5606,7 +5606,7 @@ msgstr "Attenzione selezione"
 #: __main__.py:2864 report_codes.py:1301 report_codes.py:1307
 #: report_relations.py:243 report_relations.py:244 __main__.py:2867
 #: report_codes.py:1302 report_codes.py:1308 __main__.py:2823
-msgid "Codes: "
+msgid "Labels: "
 msgstr "Codici: "
 
 #: report_relations.py:518 report_relations.py:986 report_sql.py:458
@@ -6904,7 +6904,7 @@ msgstr "È sicuro di voler cancellare il grafico?"
 #: code_organiser.py:146 view_graph.py:153 view_graph.py:160
 #, fuzzy
 #| msgid "Select coded area"
-msgid "Select code tree branch"
+msgid "Select Label Tree branch"
 msgstr "Selezionare l'area codificata"
 
 #: view_graph.py:415 view_graph.py:374 view_graph.py:375 view_graph.py:382
@@ -8168,7 +8168,7 @@ msgid "Add category"
 msgstr "Aggiungi categoria"
 
 #: code_organiser.py:586 code_organiser.py:579
-msgid "Code tree re-organised."
+msgid "Label Tree re-organised."
 msgstr "Riorganizzazione dell'albero del codice."
 
 #: code_organiser.py:931 code_organiser.py:932 code_organiser.py:925

@@ -1572,7 +1572,7 @@ msgstr "Nom de la catégorie"
 #: qualcoder\code_organiser.py:153 qualcoder\view_graph.py:152
 #: code_organiser.py:153 view_graph.py:152 code_organiser.py:146
 #: view_graph.py:153 view_graph.py:160
-msgid "Select code tree branch"
+msgid "Select Label Tree branch"
 msgstr "Sélectionner une branche de l'arborescence des codes"
 
 #: qualcoder\code_organiser.py:166 code_organiser.py:166 code_organiser.py:159
@@ -1592,7 +1592,7 @@ msgid "Image exported"
 msgstr "Image exportée"
 
 #: qualcoder\code_organiser.py:586 code_organiser.py:586 code_organiser.py:579
-msgid "Code tree re-organised."
+msgid "Label Tree re-organised."
 msgstr "Réorganisation de l'arborescence du code."
 
 #: qualcoder\code_organiser.py:932 code_organiser.py:932 code_organiser.py:925
@@ -4755,7 +4755,7 @@ msgstr "Exportation de fichier texte"
 #: report_relations.py:1012 reports.py:330 reports.py:746
 #: report_compare_coder_file.py:739 report_exact_matches.py:564
 #: report_relations.py:1102 reports.py:347 reports.py:413 reports.py:853
-msgid "Code Tree"
+msgid "Label Tree"
 msgstr "Arbre des codes"
 
 #: qualcoder\reports.py:309 reports.py:309 reports.py:319 reports.py:390
@@ -5387,7 +5387,7 @@ msgstr "Codage par : "
 #: report_codes.py:1301 report_codes.py:1307 report_relations.py:243
 #: report_relations.py:244 __main__.py:2867 report_codes.py:1302
 #: report_codes.py:1308 __main__.py:2823
-msgid "Codes: "
+msgid "Labels: "
 msgstr "Codes : "
 
 #: qualcoder\report_codes.py:1276 report_codes.py:1276 report_codes.py:1288

@@ -74,7 +74,7 @@ class Ui_Dialog_reportCompareCoderFile(object):
         self.listWidget_files.setObjectName("listWidget_files")
         self.treeWidget = QtWidgets.QTreeWidget(self.splitter_vert)
         self.treeWidget.setObjectName("treeWidget")
-        self.treeWidget.headerItem().setText(0, "Code Tree")
+        self.treeWidget.headerItem().setText(0, "Label Tree")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")

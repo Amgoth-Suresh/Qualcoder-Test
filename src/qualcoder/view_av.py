@@ -1540,7 +1540,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.recursive_traverse(root, txt)
 
     def show_codes_of_color(self):
-        """ Show all codes in colour range in code tree., ir all codes if no selection.
+        """ Show all codes in colour range in Label Tree., ir all codes if no selection.
         Show selected codes that are of a selected colour.
         """
 

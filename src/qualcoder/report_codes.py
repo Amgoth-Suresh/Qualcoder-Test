@@ -1299,13 +1299,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.textEdit.insertPlainText(f"{_('Coding by: All coders')}\n")
         else:
             self.ui.textEdit.insertPlainText(f"{_('Coding by: ')}{coder}\n")
-        codes_string = f"{_('Codes: ')}\n"
+        codes_string = f"{_('Labels: ')}\n"
         codes_count = 0
         for i in items:
             if i.text(1)[0:3] == 'cid':
                 codes_count += 1
                 codes_string += i.text(0) + ". "
-        codes_string += f"{_('Codes: ')}{codes_count} / {len(self.code_names)}"
+        codes_string += f"{_('Labels: ')}{codes_count} / {len(self.code_names)}"
         self.ui.textEdit.insertPlainText(codes_string)
 
         cur = self.app.conn.cursor()

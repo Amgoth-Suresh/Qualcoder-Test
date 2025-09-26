@@ -157,7 +157,7 @@ class ViewGraph(QDialog):
         selection_list = [{'name': 'All'}]
         for category in self.categories:
             selection_list.append({'name': category['name']})
-        ui = DialogSelectItems(self.app, selection_list, _("Select code tree branch"), "multi")
+        ui = DialogSelectItems(self.app, selection_list, _("Select Label Tree branch"), "multi")
         ok = ui.exec()
         if not ok:
             return

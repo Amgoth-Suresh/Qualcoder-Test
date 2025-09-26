@@ -249,7 +249,7 @@ Codings from the entire text file are used for the calculations.</string>
     </font>
    </property>
    <property name="text">
-    <string>&lt;b&gt;Coding charts&lt;/b&gt;</string>
+    <string>&lt;b&gt;Labeling charts&lt;/b&gt;</string>
    </property>
   </widget>
   <widget class="QComboBox" name="comboBox_category">

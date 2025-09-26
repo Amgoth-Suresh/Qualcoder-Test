@@ -240,8 +240,8 @@ class DialogReportRelations(QtWidgets.QDialog):
             Message(self.app, _('Selection warning'), msg, "warning").exec()
             return
         code_ids = code_ids[1:]
-        self.ui.label_codes.setText(_("Codes: ") + codes_str)
-        self.ui.label_codes.setToolTip(_("Codes: ") + codes_str)
+        self.ui.label_codes.setText(_("Labels: ") + codes_str)
+        self.ui.label_codes.setToolTip(_("Labels: ") + codes_str)
         self.result_relations = []
         if self.ui.radioButton_this.isChecked():
             self.calculate_relations_for_coder_and_selected_codes(self.app.settings['codername'], code_ids)
@@ -1099,7 +1099,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        header = [_("Code Tree"), _("Id")]
+        header = [_("Label Tree"), _("Id")]
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
