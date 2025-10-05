@@ -1380,8 +1380,8 @@ Click "Yes" to start now.')
         self.ui.actionCharts.setShortcut('Alt+U')
         self.ui.actionCharts.triggered.connect(self.view_charts)
         # TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
-        self.ui.actionSQL_statements.setShortcut('Alt+D')
-        self.ui.actionSQL_statements.triggered.connect(self.report_sql)
+        #self.ui.actionSQL_statements.setShortcut('Alt+D')
+        #self.ui.actionSQL_statements.triggered.connect(self.report_sql)
         # AI menu
         # AI_CHAT_DISABLED (Aug 2025)
         # Reason: Prevent using AI Chat functionality.
