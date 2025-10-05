@@ -112,28 +112,28 @@ class ViewCharts(QDialog):
         self.ui.comboBox_file.currentIndexChanged.connect(self.clear_combobox_cases)
         self.get_selected_categories_and_codes()
         self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
-        pie_combobox_list = ['', _('Code frequency'),
-                             _('Code by characters'),
-                             _('Code by image area'),
-                             _('Code by audio/video segments'),
+        pie_combobox_list = ['', _('Label frequency'),
+                             _('Label by characters'),
+                             _('Label by image area'),
+                             _('Label by audio/video segments'),
                              ]
         self.ui.comboBox_pie_charts.addItems(pie_combobox_list)
         self.ui.comboBox_sunburst_charts.currentIndexChanged.connect(self.show_hierarchy_chart)
-        sunburst_combobox_list = ['', _('Code frequency sunburst'),
-                                  _('Code frequency treemap'),
-                                  _('Code by characters sunburst'),
-                                  _('Code by characters treemap'),
-                                  _('Code by image area sunburst'),
-                                  _('Code by image area treemap'),
-                                  _('Code by A/V sunburst'),
-                                  _('Code by A/V treemap')
+        sunburst_combobox_list = ['', _('Label frequency sunburst'),
+                                  #_('Code frequency treemap'),
+                                  _('Label by characters sunburst'),
+                                  #_('Code by characters treemap'),
+                                  _('Label by image area sunburst'),
+                                  #_('Code by image area treemap'),
+                                  _('Label by A/V sunburst'),
+                                  #_('Code by A/V treemap')
                                   ]
         self.ui.comboBox_sunburst_charts.addItems(sunburst_combobox_list)
         self.ui.comboBox_bar_charts.currentIndexChanged.connect(self.show_bar_chart)
-        bar_combobox_list = ['', _('Code frequency'),
-                             _('Code by characters'),
-                             _('Code by image area'),
-                             _('Code by audio/video segments')
+        bar_combobox_list = ['', _('Label frequency'),
+                             _('Label by characters'),
+                             _('Label by image area'),
+                             _('Label by audio/video segments')
                              ]
         self.ui.comboBox_bar_charts.addItems(bar_combobox_list)
         categories_combobox_list = [""]
@@ -775,20 +775,20 @@ class ViewCharts(QDialog):
         self.helper_for_matching_category_and_code_name()
         if chart_type_index == 1:  # Code frequency sunburst
             self.hierarchy_code_frequency("sunburst")
-        if chart_type_index == 2:  # Code frequency treemap
-            self.hierarchy_code_frequency("treemap")
-        if chart_type_index == 3:  # Code by characters sunburst
+        #if chart_type_index == 2:  # Code frequency treemap
+            #self.hierarchy_code_frequency("treemap")
+        if chart_type_index == 2:  # Code by characters sunburst
             self.hierarchy_code_volume_by_characters("sunburst")
-        if chart_type_index == 4:  # Code by characters treemap
-            self.hierarchy_code_volume_by_characters("treemap")
-        if chart_type_index == 5:  # Code by image area sunburst
+        #if chart_type_index == 4:  # Code by characters treemap
+            #self.hierarchy_code_volume_by_characters("treemap")
+        if chart_type_index == 3:  # Code by image area sunburst
             self.hierarchy_code_volume_by_area("sunburst")
-        if chart_type_index == 6:  # Code by image area treemap
-            self.hierarchy_code_volume_by_area("treemap")
-        if chart_type_index == 7:  # Code by A/V sunburst
+        #if chart_type_index == 6:  # Code by image area treemap
+            #self.hierarchy_code_volume_by_area("treemap")
+        if chart_type_index == 4:  # Code by A/V sunburst
             self.hierarchy_code_volume_by_segments("sunburst")
-        if chart_type_index == 8:  # Code by A/V treemap
-            self.hierarchy_code_volume_by_segments("treemap")
+        #if chart_type_index == 8:  # Code by A/V treemap
+            #self.hierarchy_code_volume_by_segments("treemap")
         self.ui.comboBox_sunburst_charts.setCurrentIndex(0)
 
     def helper_for_matching_category_and_code_name(self):

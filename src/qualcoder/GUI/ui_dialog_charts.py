@@ -281,7 +281,7 @@ class Ui_DialogCharts(object):
         self.label_info.setText(_translate("DialogCharts", "Charts displayed in the default web browser"))
         self.label_pie.setText(_translate("DialogCharts", "Pie charts"))
         self.label_bar.setText(_translate("DialogCharts", "Bar charts"))
-        self.label_hierarchy.setText(_translate("DialogCharts", "Sunburst and treemap charts"))
+        self.label_hierarchy.setText(_translate("DialogCharts", "Sunburst charts"))
         self.label_coder.setText(_translate("DialogCharts", "Select coder"))
         self.label_select_file.setText(_translate("DialogCharts", "Select file"))
         self.comboBox_case.setToolTip(_translate("DialogCharts", "If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.\n"
