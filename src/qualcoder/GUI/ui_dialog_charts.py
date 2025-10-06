@@ -313,7 +313,7 @@ class Ui_DialogCharts(object):
             "Use the Upper Count Limiter to set a maximum value so extreme counts don't distort the colors."
         ))
         self.label_matrix_description.setGeometry(QtCore.QRect(10, 325, 321, 49))
-        self.label_word_clouds.setText(_translate("DialogCharts", "Word cloud"))
+        self.label_word_clouds.setText(_translate("DialogCharts", "<b>Word cloud</b>"))
         self.comboBox_wordcloud_background.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Background</p></body></html>"))
         self.comboBox_wordcloud_foreground.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Foreground</p></body></html>"))
         self.pushButton_wordcloud.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Make Word Cloud</p></body></html>"))

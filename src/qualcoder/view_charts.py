@@ -165,7 +165,10 @@ class ViewCharts(QDialog):
         self.ui.lineEdit_width.setText("800")
         self.ui.lineEdit_width.setValidator(QtGui.QIntValidator(100, 2000))
         self.ui.lineEdit_height.setText("600")
-        self.ui.pushButton_wordcloud.setIcon(qta.icon('mdi6.file-word-box', options=[{'scale_factor': 2}]))
+        # Make the icon larger by setting icon size on the button
+        icon = qta.icon('mdi6.play', options=[{'scale_factor': 2}])
+        self.ui.pushButton_wordcloud.setIcon(icon)
+        self.ui.pushButton_wordcloud.setIconSize(QtCore.QSize(28, 28))  # Adjust size as needed
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
