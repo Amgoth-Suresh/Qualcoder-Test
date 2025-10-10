@@ -114,8 +114,8 @@ class ViewCharts(QDialog):
         self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
         pie_combobox_list = ['', _('Label frequency'),
                              _('Label by characters'),
-                             _('Label by image area'),
-                             _('Label by audio/video segments'),
+                             #_('Label by image area'),
+                             #_('Label by audio/video segments'),
                              ]
         self.ui.comboBox_pie_charts.addItems(pie_combobox_list)
         self.ui.comboBox_sunburst_charts.currentIndexChanged.connect(self.show_hierarchy_chart)
@@ -132,8 +132,8 @@ class ViewCharts(QDialog):
         self.ui.comboBox_bar_charts.currentIndexChanged.connect(self.show_bar_chart)
         bar_combobox_list = ['', _('Label frequency'),
                              _('Label by characters'),
-                             _('Label by image area'),
-                             _('Label by audio/video segments')
+                             #_('Label by image area'),
+                             #_('Label by audio/video segments')
                              ]
         self.ui.comboBox_bar_charts.addItems(bar_combobox_list)
         categories_combobox_list = [""]
