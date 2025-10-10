@@ -118,17 +118,17 @@ class ViewCharts(QDialog):
                              #_('Label by audio/video segments'),
                              ]
         self.ui.comboBox_pie_charts.addItems(pie_combobox_list)
-        self.ui.comboBox_sunburst_charts.currentIndexChanged.connect(self.show_hierarchy_chart)
-        sunburst_combobox_list = ['', _('Label frequency sunburst'),
+        #self.ui.comboBox_sunburst_charts.currentIndexChanged.connect(self.show_hierarchy_chart)
+        sunburst_combobox_list = ['',# _('Label frequency sunburst'),
                                   #_('Code frequency treemap'),
-                                  _('Label by characters sunburst'),
+                                  #_('Label by characters sunburst'),
                                   #_('Code by characters treemap'),
-                                  _('Label by image area sunburst'),
+                                  #_('Label by image area sunburst'),
                                   #_('Code by image area treemap'),
-                                  _('Label by A/V sunburst'),
+                                 # _('Label by A/V sunburst'),
                                   #_('Code by A/V treemap')
                                   ]
-        self.ui.comboBox_sunburst_charts.addItems(sunburst_combobox_list)
+        #self.ui.comboBox_sunburst_charts.addItems(sunburst_combobox_list)
         self.ui.comboBox_bar_charts.currentIndexChanged.connect(self.show_bar_chart)
         bar_combobox_list = ['', _('Label frequency'),
                              _('Label by characters'),
@@ -624,10 +624,10 @@ class ViewCharts(QDialog):
             self.piechart_code_frequency()
         if chart_type_index == 2:  # Code by characters
             self.piechart_code_volume_by_characters()
-        if chart_type_index == 3:  # Code by image area
-            self.piechart_code_volume_by_area()
-        if chart_type_index == 4:  # Code by audio/video segments
-            self.piechart_code_volume_by_segments()
+        #if chart_type_index == 3:  # Code by image area
+            #self.piechart_code_volume_by_area()
+        #if chart_type_index == 4:  # Code by audio/video segments
+           # self.piechart_code_volume_by_segments()
         self.ui.comboBox_pie_charts.setCurrentIndex(0)
 
     def piechart_code_frequency(self):
@@ -765,7 +765,7 @@ class ViewCharts(QDialog):
         fig.show()
         self.helper_export_html(fig)
 
-    def show_hierarchy_chart(self):
+    '''def show_hierarchy_chart(self):
         """ Disp;lay treemaps and sunburst charts.
         https://plotly.com/python/sunburst-charts/
         Index numbering matches order of options, set up in init
@@ -1146,7 +1146,7 @@ class ViewCharts(QDialog):
             fig = px.treemap(df[mask], names='item', parents='parent', values='value',
                              title=title + subtitle)
             fig.show()
-            self.helper_export_html(fig)
+            self.helper_export_html(fig)'''
 
     # ATTRIBUTES CHARTS SECTION
     def fill_combobox_attributes(self):
