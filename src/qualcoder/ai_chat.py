@@ -219,7 +219,7 @@ class DialogAIChat(QtWidgets.QDialog):
     @staticmethod
     def help():
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/5.1.-AI-chat-based-analysis"
+        url = "https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/5.1.-AI-chat-based-analysis"
         webbrowser.open(url)
 
     def get_chat_list(self):

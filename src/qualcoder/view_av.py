@@ -296,7 +296,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.5.-Coding-Audio-and-Video"
+        url = "https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/4.5.-Coding-Audio-and-Video"
         webbrowser.open(url)
 
     def find_code_in_tree(self):
@@ -4280,7 +4280,7 @@ class DialogViewAV(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
+        url = "https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/3.2.-Files"
         webbrowser.open(url)
 
     def ddialog_menu(self, position):

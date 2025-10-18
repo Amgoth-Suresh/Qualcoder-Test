@@ -1289,7 +1289,7 @@ Click "Yes" to start now.')
                 while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
                     reply = msg_box.exec()
                     if reply == QtWidgets.QMessageBox.StandardButton.Help:
-                        webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
+                        webbrowser.open('https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/2.3.-AI-Setup')                
                 if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                     self.ai_setup_wizard()  # (will also init the llm)
             else:
@@ -1733,7 +1733,7 @@ Click "Yes" to start now.')
     def help():
         """ Display manual in browser. """
 
-        webbrowser.open("https://github.com/ccbogel/QualCoder/wiki")
+        webbrowser.open("https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis")
 
     def display_menu_key_shortcuts(self):
         self.ui.textEdit.append(menu_shortcuts_display)

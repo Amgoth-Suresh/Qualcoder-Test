@@ -3629,7 +3629,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.3.-Coding-Text-on-PDFs"
+        url = "https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/4.3.-Coding-Text-on-PDFs"
         webbrowser.open(url)
 
 

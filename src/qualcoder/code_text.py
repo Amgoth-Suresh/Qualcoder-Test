@@ -369,7 +369,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.1.-Coding-Text"
+        url = "https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/4.1.-Coding-Text"
         webbrowser.open(url)
 
     def show_right_side_pane(self):

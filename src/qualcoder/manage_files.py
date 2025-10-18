@@ -158,7 +158,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
+        url = "https://dbfz-git01.leipzig.dbfz.de/datalab/team/qualcoder/-/wikis/3.2.-Files"
         webbrowser.open(url)
 
     def table_display_save(self):
