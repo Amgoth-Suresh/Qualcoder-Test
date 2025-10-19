@@ -37,7 +37,12 @@ from .report_attributes import DialogSelectAttributeParameters
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
+pal_corporate = [
+            "#97bf13", "#688816", "#3f570a", "#838383",
+            "#00616f", "#01b3c4", "#00a182"
+        ]
+pal_colorblind = ['#0072B2', '#E69F00', '#009E73', '#F0E442',
+                        '#56B4E9', '#D55E00', '#CC79A7', '#000000']
 
 class ViewCharts(QDialog):
     """ Dialog to view various charts of codes and categories.
