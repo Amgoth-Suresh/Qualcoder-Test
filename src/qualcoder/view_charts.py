@@ -634,46 +634,143 @@ class ViewCharts(QDialog):
         #if chart_type_index == 4:  # Code by audio/video segments
            # self.piechart_code_volume_by_segments()
         self.ui.comboBox_pie_charts.setCurrentIndex(0)
+    
 
-    def piechart_code_frequency(self):
-        """ Count of codes across text, images and A/V.
-        """
 
-        title = _('Code count - text, images and Audio/Video')
+    def hierarchy_code_frequency(self):
+
+        title = "Chart of Code and Category Counts"
         owner, subtitle = self.owner_and_subtitle_helper()
-        cur = self.app.conn.cursor()
-        values = []
-        labels = []
         case_file_name, file_ids = self.get_file_ids()
-        if case_file_name != "":
+        if case_file_name:
             subtitle += case_file_name
-        for c in self.codes:
-            sql = "select count(cid) from code_text where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_text = cur.fetchone()
-            sql = "select count(cid) from code_image where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_image where cid=? and owner like ? and id" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_image = cur.fetchone()
-            sql = "select count(cid) from code_av where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_av where cid=? and owner like ? and id" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_av = cur.fetchone()
-            labels.append(c['name'])
-            values.append(res_text[0] + res_image[0] + res_av[0])
-        # Create pandas DataFrame
-        data = {'Code names': labels, 'Count': values}
-        df = pd.DataFrame(data)
-        mask = df['Count'] != 0
+
+        # --- gather coded cids from DB (text, image, av) ---
+        coded = []
+        cur = self.app.conn.cursor()
+        for table, id_field in [("code_text", "fid"), ("code_image", "id"), ("code_av", "id")]:
+            sql = f"SELECT cid FROM {table} WHERE owner LIKE ?"
+            if file_ids:
+                sql += f" AND {id_field}" + file_ids
+            cur.execute(sql, [owner])
+            coded.extend(cur.fetchall())
+
+        # --- code counts ---
+        cid_counts = {}
+        for (cid,) in coded:
+            cid_counts[cid] = cid_counts.get(cid, 0) + 1
+        for code in self.codes:
+            code["count"] = cid_counts.get(code["cid"], 0)
+
+        # --- category lookups ---
+        parentid_by_id = {c["catid"]: c.get("supercatid") for c in self.categories}
+        name_by_id     = {c["catid"]: c["name"] for c in self.categories}
+        top_names      = [c["name"] for c in self.categories if not c.get("supercatid")]  # center nodes
+
+        def topcat_name(catid):
+            cur = catid
+            seen = set()
+            while parentid_by_id.get(cur):
+                if cur in seen:  # safety
+                    break
+                seen.add(cur)
+                cur = parentid_by_id[cur]
+            return name_by_id.get(cur, "")
+
+        # --- build children (codes → top category) and center values (sum of their codes) ---
+        top_sums = {}
+        children = []
+        for code in self.codes:
+            cnt = int(code.get("count", 0))
+            if cnt == 0:
+                continue
+            top = topcat_name(code.get("catid"))
+            top_sums[top] = top_sums.get(top, 0) + cnt
+            children.append({"item": code["name"], "value": cnt, "parent": top})
+
+        centers = [{"item": nm, "value": int(top_sums.get(nm, 0)), "parent": ""} for nm in top_names]
+        df = pd.DataFrame(centers + children)
+
+        # --- optional cutoff (keep centers; filter children) ---
         cutoff = self.ui.lineEdit_filter.text()
-        if cutoff != "":
-            mask = df['Count'] >= int(cutoff)
-            subtitle += _("Values") + " >= " + cutoff
-        fig = px.pie(df[mask], values='Count', names='Code names', title=title + subtitle)
+        if cutoff:
+            try:
+                thr = int(cutoff)
+                centers_df = df[df["parent"] == ""]
+                kids_df    = df[df["parent"] != ""]
+                kids_df    = kids_df[kids_df["value"] >= thr]
+                df = pd.concat([centers_df, kids_df], ignore_index=True)
+                subtitle += f" (Values ≥ {cutoff})"
+            except ValueError:
+                pass
+
+        # --- POST-FILTER FIX: ensure every center has children & parent equals sum(children) ---
+        centers_df = df[df["parent"] == ""].copy()
+        kids_df    = df[df["parent"] != ""].copy()
+
+        # recompute child sums by parent using remaining kids
+        child_sums = kids_df.groupby("parent")["value"].sum().to_dict()
+
+        fixed_centers = []
+        extra_kids = []
+
+        for _, c in centers_df.iterrows():
+            name = c["item"]
+            sum_children = int(child_sums.get(name, 0))
+
+            if sum_children > 0:
+                # align parent value to children sum
+                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": sum_children})
+            else:
+                # no children -> create a duplicate child, give it a minimal positive value
+                dup_val = max(int(c["value"]), 1)
+                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": dup_val})
+                extra_kids.append({"id": f"dup::{name}", "parent_id": f"cat::{name}", "item": name, "value": dup_val})
+
+        # rebuild kids with stable unique ids and parent ids (cat::<topname>)
+        fixed_kids = []
+        for _, r in kids_df.iterrows():
+            fixed_kids.append({
+                "id": f"code::{r['item']}::{r['parent']}",
+                "parent_id": f"cat::{r['parent']}",
+                "item": r["item"],
+                "value": int(r["value"])
+            })
+
+        d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
+
+        # consistent colors: children share topcat color (use parent_id for grouping)
+        def color_group(row):
+            return row["id"] if row["parent_id"] == "" else row["parent_id"]
+        d2["color_group"] = d2.apply(color_group, axis=1)
+
+        # --- plot (exactly two levels; full outer ring) ---
+        fig = px.sunburst(
+            d2,
+            ids="id",               # unique ids prevent label-merge
+            parents="parent_id",
+            names="item",
+            values="value",
+            color="color_group",
+            branchvalues="total",   # parent size == sum(children)
+            maxdepth=2,
+            title=title + " " + subtitle
+        )
+        fig.update_traces(
+            insidetextorientation="radial",
+            hovertemplate="<b>%{label}</b><br>"
+                        "Parent: %{parent}<br>"
+                        "Count: %{value}<br>"
+                        "% of parent: %{percentParent:.1%}<br>"
+                        "% of total: %{percentRoot:.1%}<extra></extra>"
+        )
+        fig.update_layout(
+            uniformtext_minsize=10,
+            uniformtext_mode="hide",
+            margin=dict(l=0, r=0, t=60, b=0),
+            showlegend=False
+        )
+
         fig.show()
         self.helper_export_html(fig)
 
