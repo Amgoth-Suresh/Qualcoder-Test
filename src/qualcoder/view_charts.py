@@ -628,18 +628,155 @@ class ViewCharts(QDialog):
         if chart_type_index == 1:  # Code frequency
             self.piechart_code_frequency()
         if chart_type_index == 2:  # Code by characters
-            self.piechart_code_volume_by_characters()
+            self.piechart_code_volume_by_characters1()
         #if chart_type_index == 3:  # Code by image area
             #self.piechart_code_volume_by_area()
         #if chart_type_index == 4:  # Code by audio/video segments
            # self.piechart_code_volume_by_segments()
         self.ui.comboBox_pie_charts.setCurrentIndex(0)
+    def piechart_code_volume_by_characters1(self):
+
+        title = 'Label text by character count'
+        owner, subtitle = self.owner_and_subtitle_helper()
+        cur = self.app.conn.cursor()
+
+        # --- same inputs/queries as before: per-code total characters ---
+        values = []
+        labels = []
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+
+        for c in self.codes:
+            sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            if file_ids != "":
+                sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
+            cur.execute(sql, [c['cid'], owner])
+            res = cur.fetchone()
+            labels.append(c['name'])
+            values.append((res[0] or 0))  # keep None as 0
+
+        # Build initial dataframe from exactly the same inputs
+        df_raw = pd.DataFrame({'Label names': labels, 'Total characters': values})
+
+        # --- category lookups (for two-level structure) ---
+        parentid_by_id = {c["catid"]: c.get("supercatid") for c in self.categories}
+        name_by_id     = {c["catid"]: c["name"] for c in self.categories}
+        top_names      = [c["name"] for c in self.categories if not c.get("supercatid")]
+
+        # helper: resolve top category name for a given category id
+        def topcat_name(catid):
+            curid = catid
+            seen = set()
+            while parentid_by_id.get(curid):
+                if curid in seen:
+                    break
+                seen.add(curid)
+                curid = parentid_by_id[curid]
+            return name_by_id.get(curid, "")
+
+        # map code -> cat/topcat using self.codes (no DB changes)
+        code_to_cat   = {c["name"]: c.get("catid") for c in self.codes}
+        code_to_top   = {nm: topcat_name(code_to_cat.get(nm)) for nm in labels}
+
+        # children rows (codes) using the original totals
+        kids = []
+        top_sums = {}
+        for _, r in df_raw.iterrows():
+            code = r['Label names']
+            val  = int(r['Total characters'] or 0)
+            if val <= 0:
+                continue  # drop zero-size kids (centers are handled below)
+            top = code_to_top.get(code, "")
+            kids.append({"item": code, "value": val, "parent": top})
+            top_sums[top] = top_sums.get(top, 0) + val
+
+        # center rows (top categories) with preliminary totals
+        centers = [{"item": nm, "value": int(top_sums.get(nm, 0)), "parent": ""} for nm in top_names]
+
+        df = pd.DataFrame(centers + kids)
+
+        # --- optional cutoff (filter children only; keep all centers) ---
+        cutoff = self.ui.lineEdit_filter.text()
+        if cutoff:
+            try:
+                thr = int(cutoff)
+                centers_df = df[df["parent"] == ""]
+                kids_df    = df[(df["parent"] != "") & (df["value"] >= thr)]
+                df = pd.concat([centers_df, kids_df], ignore_index=True)
+                subtitle += _(" (Values ≥ ") + cutoff + ")"
+            except ValueError:
+                pass
+
+        # --- Post-filter fix: align parent sizes to remaining children; duplicate lone parents as their own child ---
+        centers_df = df[df["parent"] == ""].copy()
+        kids_df    = df[df["parent"] != ""].copy()
+        child_sums = kids_df.groupby("parent")["value"].sum().to_dict()
+
+        fixed_centers = []
+        extra_kids = []
+        for _, c in centers_df.iterrows():
+            name = c["item"]
+            sum_children = int(child_sums.get(name, 0))
+            if sum_children > 0:
+                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": sum_children})
+            else:
+                dup_val = max(int(c["value"]), 1)  # keep visible center and a tiny child if it had no kids
+                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": dup_val})
+                extra_kids.append({"id": f"dup::{name}", "parent_id": f"cat::{name}", "item": name, "value": dup_val})
+
+        fixed_kids = []
+        for _, r in kids_df.iterrows():
+            fixed_kids.append({
+                "id": f"code::{r['item']}::{r['parent']}",
+                "parent_id": f"cat::{r['parent']}",
+                "item": r["item"],
+                "value": int(r["value"])
+            })
+
+        d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
+
+        # consistent colors: children share their parent's color
+        def color_group(row):
+            return row["id"] if row["parent_id"] == "" else row["parent_id"]
+        d2["color_group"] = d2.apply(color_group, axis=1)
+
+        # --- plot two-level sunburst ---
+        fig = px.sunburst(
+            d2,
+            ids="id",
+            parents="parent_id",
+            names="item",
+            values="value",
+            color="color_group",
+            branchvalues="total",
+            maxdepth=2,
+            title=title + " " + subtitle
+        )
+        fig.update_traces(
+            insidetextorientation="radial",
+            hovertemplate="<b>%{label}</b><br>"
+                        "Parent: %{parent}<br>"
+                        "Characters: %{value}<br>"
+                        "% of parent: %{percentParent:.1%}<br>"
+                        "% of total: %{percentRoot:.1%}<extra></extra>"
+        )
+        fig.update_layout(
+            uniformtext_minsize=10,
+            uniformtext_mode="hide",
+            margin=dict(l=0, r=0, t=60, b=0),
+            showlegend=False
+        )
+
+        fig.show()
+        self.helper_export_html(fig)
+
     
 
 
     def hierarchy_code_frequency(self):
 
-        title = "Chart of Code and Category Counts"
+        title = "Chart of Label and Category Counts"
         owner, subtitle = self.owner_and_subtitle_helper()
         case_file_name, file_ids = self.get_file_ids()
         if case_file_name:
