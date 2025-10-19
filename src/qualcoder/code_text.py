@@ -345,12 +345,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
         # AI search
-        self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
-        self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
+        #self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
+        #self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
-        self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
-        self.ui.ai_progressBar.setVisible(False)
-        self.ui.ai_progressBar.setStyleSheet(f"""
+        #self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
+        #self.ui.ai_progressBar.setVisible(False)
+        '''self.ui.ai_progressBar.setStyleSheet(f"""
             QProgressBar::chunk {{
                 background-color: {self.app.highlight_color()};
             }}
@@ -363,7 +363,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_ai_model = None
         self.ai_search_found = False
         self.ai_include_coded_segments = None
-        self.ai_search_analysis_counter = 0
+        self.ai_search_analysis_counter = 0'''
 
     @staticmethod
     def help():
@@ -4862,8 +4862,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
             # Prepare the UI
             self.ai_search_running = True
-            self.ui.pushButton_ai_search.setText(self.ai_search_code_name)
-            self.ui.pushButton_ai_search.setStyleSheet('text-align: left')
+            #self.ui.pushButton_ai_search.setText(self.ai_search_code_name)
+            #self.ui.pushButton_ai_search.setStyleSheet('text-align: left')
             self.ui.listWidget_ai.clear()
             self.ai_search_current_result_index = None
             self.ai_search_spinner_timer.start(500)
