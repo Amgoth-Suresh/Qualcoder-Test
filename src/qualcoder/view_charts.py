@@ -519,7 +519,7 @@ class ViewCharts(QDialog):
         if chart_type_index == 1:  # Code frequency
             self.barchart_code_frequency_new(color_palette)
         if chart_type_index == 2:  # Code by characters
-            self.barchart_code_volume_by_characters()
+            self.barchart_code_volume_by_characters_new(color_palette)
         if chart_type_index == 3:  # Code by image area
             self.barchart_code_volume_by_area()
         if chart_type_index == 4:  # Code by audio/video segments
@@ -692,80 +692,512 @@ class ViewCharts(QDialog):
         fig.show()
         self.helper_export_html(fig)
 
+    def barchart_code_volume_by_characters_new(self, color_palette=None):
+        TOP_N_FILES = 5     # top files to show as separate stacks
+        TOP_N_OWNERS = 5    # top coders to show as separate stacks
 
-    def barchart_code_volume_by_characters(self):
-
-        title = _('Code text by character count')
+        title = _('Label text by character count')
         owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
 
-        labels, text_counts, image_counts, av_counts = [], [], [], []
-
+        label_list, totals, per_label_file, per_label_owner = [], [], [], []
         case_file_name, file_ids = self.get_file_ids()
-        if case_file_name != "":
-
-        # --- collect counts per code for Text / Image / A/V ---
-            # Text
+        if case_file_name:
             subtitle += case_file_name
-        for c in self.codes:
-            sql = "select count(cid) from code_text where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_text = cur.fetchone()
-            sql = "select count(cid) from code_image where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_image where cid=? and owner like ? and id" + file_ids
 
-            cur.execute(sql, [c['cid'], owner])
-            res_image = cur.fetchone()
-            sql = "select count(cid) from code_av where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select count(cid) from code_av where cid=? and owner like ? and id" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res_av = cur.fetchone()
-            labels.append(c['name'])
-            values.append(res_text[0] + res_image[0] + res_av[0])
-        # Create pandas DataFrame
-        data = {'Code names': labels, 'Count': values}
-        df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
-        mask = df['Count'] != 0
-        if cutoff != "":
-            mask = df['Count'] >= int(cutoff)
-            subtitle += _("Values") + " >= " + cutoff
-        fig = px.bar(df[mask], y='Code names', x='Count', orientation='h', title=title + subtitle)
+        file_name_cache = {}
+
+        # --- Collect totals, per-file, and per-owner data ---
+        for c in self.codes:
+            # Total chars per label (respects owner filter)
+            sql_total = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            if file_ids:
+                sql_total += " and fid" + file_ids
+            cur.execute(sql_total, [c['cid'], owner])
+            total_chars = (cur.fetchone()[0] or 0)
+
+            # Per-file breakdown
+            sql_pf = "select fid, sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            if file_ids:
+                sql_pf += " and fid" + file_ids
+            sql_pf += " group by fid"
+            cur.execute(sql_pf, [c['cid'], owner])
+            rows_file = cur.fetchall() or []
+            filedict = {}
+            for fid, s in rows_file:
+                if fid is None:
+                    continue
+                val = (s or 0)
+                if fid not in file_name_cache:
+                    try:
+                        cur2 = self.app.conn.cursor()
+                        cur2.execute("select name from source where id=?", [fid])
+                        nm = cur2.fetchone()
+                        file_name_cache[fid] = nm[0] if nm and nm[0] else f"File {fid}"
+                    except Exception:
+                        file_name_cache[fid] = f"File {fid}"
+                fname = file_name_cache[fid]
+                filedict[fname] = filedict.get(fname, 0) + val
+
+            # Per-owner breakdown
+            sql_po = "select owner, sum(pos1 - pos0) from code_text where cid=?"
+            if file_ids:
+                sql_po += " and fid" + file_ids
+            sql_po += " group by owner"
+            cur.execute(sql_po, [c['cid']])
+            rows_owner = cur.fetchall() or []
+            ownerdict = {}
+            for own, s in rows_owner:
+                key = own if (own and str(own).strip() != "") else _("(Unassigned)")
+                ownerdict[key] = ownerdict.get(key, 0) + (s or 0)
+
+            label_list.append(c['name'])
+            totals.append(total_chars)
+            per_label_file.append(filedict)
+            per_label_owner.append(ownerdict)
+
+        # --- DataFrame of totals + cutoff filter ---
+        df_total = pd.DataFrame({'Label names': label_list, 'Total': totals})
+        if self.ui.lineEdit_filter.text():
+            try:
+                thr = int(self.ui.lineEdit_filter.text())
+                df_total = df_total[df_total['Total'] >= thr]
+                subtitle += _(" Values ≥ ") + str(thr)
+            except ValueError:
+                pass
+        df_total = df_total[df_total['Total'] > 0]
+        if df_total.empty:
+            self.ui.textEdit.append(_("No data to display."))
+            return
+        df_total = df_total.sort_values('Total', ascending=False).reset_index(drop=True)
+
+        # Order dicts to match sorted labels
+        label_to_files = dict(zip(label_list, per_label_file))
+        label_to_owners = dict(zip(label_list, per_label_owner))
+        ordered_labels = df_total['Label names'].tolist()
+
+        # --- Stack by File ---
+        from collections import defaultdict
+        global_file_sums = defaultdict(int)
+        for lab in ordered_labels:
+            for fname, val in label_to_files.get(lab, {}).items():
+                global_file_sums[fname] += val
+        top_files = [fname for fname, _ in sorted(global_file_sums.items(), key=lambda kv: kv[1], reverse=True)[:TOP_N_FILES]]
+
+        stack_file_rows = []
+        file_has_other = False
+        for lab in ordered_labels:
+            row = {'Label names': lab}
+            fdict = label_to_files.get(lab, {})
+            other_sum = 0
+            for fname in top_files:
+                row[fname] = fdict.get(fname, 0)
+            for fname, val in fdict.items():
+                if fname not in top_files:
+                    other_sum += val
+            if other_sum > 0:
+                row['Other (files)'] = other_sum
+                file_has_other = True
+            stack_file_rows.append(row)
+        df_stack_file = pd.DataFrame(stack_file_rows).fillna(0)
+        file_cols = top_files + (['Other (files)'] if file_has_other else [])
+
+        # --- Stack by Coder ---
+        global_owner_sums = defaultdict(int)
+        for lab in ordered_labels:
+            for own, val in label_to_owners.get(lab, {}).items():
+                global_owner_sums[own] += val
+        top_owners = [own for own, _ in sorted(global_owner_sums.items(), key=lambda kv: kv[1], reverse=True)[:TOP_N_OWNERS]]
+
+        stack_owner_rows = []
+        owner_has_other = False
+        for lab in ordered_labels:
+            row = {'Label names': lab}
+            odict = label_to_owners.get(lab, {})
+            other_sum = 0
+            for own in top_owners:
+                row[own] = odict.get(own, 0)
+            for own, val in odict.items():
+                if own not in top_owners:
+                    other_sum += val
+            if other_sum > 0:
+                row['Other (coders)'] = other_sum
+                owner_has_other = True
+            stack_owner_rows.append(row)
+        df_stack_owner = pd.DataFrame(stack_owner_rows).fillna(0)
+        owner_cols = top_owners + (['Other (coders)'] if owner_has_other else [])
+
+        # --- Color handling (radio buttons) ---
+        if color_palette is None:
+            color_palette = self.get_color_palette()
+
+        # Assign solid colors (no cycling)
+        total_color = color_palette[0] if color_palette else None
+        file_colors = color_palette[:len(file_cols)] if color_palette else [None]*len(file_cols)
+        owner_colors = color_palette[:len(owner_cols)] if color_palette else [None]*len(owner_cols)
+
+        # --- Build figure ---
+        import plotly.graph_objects as go
+        fig = go.Figure()
+
+        # 0) Total (Normal)
+        fig.add_trace(go.Bar(
+            y=df_total['Label names'],
+            x=df_total['Total'],
+            name=_('Total'),
+            orientation='h',
+            text=df_total['Total'],
+            textposition='auto',
+            marker=(dict(color=total_color) if total_color else None)
+        ))
+
+        # 1..F) Stacked (by File)
+        for idx, col in enumerate(file_cols):
+            color = file_colors[idx] if idx < len(file_colors) else None
+            fig.add_trace(go.Bar(
+                y=df_stack_file['Label names'],
+                x=df_stack_file[col],
+                name=col,
+                orientation='h',
+                text=df_stack_file[col],
+                textposition='auto',
+                marker=(dict(color=color) if color else None)
+            ))
+
+        # F+1..end) Stacked (by Coder)
+        for idx, col in enumerate(owner_cols):
+            color = owner_colors[idx] if idx < len(owner_colors) else None
+            fig.add_trace(go.Bar(
+                y=df_stack_owner['Label names'],
+                x=df_stack_owner[col],
+                name=col,
+                orientation='h',
+                text=df_stack_owner[col],
+                textposition='auto',
+                marker=(dict(color=color) if color else None)
+            ))
+
+        # Visibility masks
+        file_len = len(file_cols)
+        owner_len = len(owner_cols)
+        vis_normal   = [True]  + [False]*file_len + [False]*owner_len
+        vis_by_file  = [False] + [True]*file_len  + [False]*owner_len
+        vis_by_owner = [False] + [False]*file_len + [True]*owner_len
+
+        for i, v in enumerate(vis_normal):
+            fig.data[i].visible = v
+
+        # Layout + buttons
+        fig.update_traces(marker_line_width=0.5, marker_line_color='white')
+        fig.update_layout(
+            title={'text': f"{title}{subtitle}", 'x': 0.5, 'xanchor': 'center'},
+            template='seaborn',
+            paper_bgcolor='#f6f7fb',
+            plot_bgcolor='#f6f7fb',
+            barmode='group',
+            bargap=0.2,
+            height=640,
+            margin=dict(l=180, r=40, t=90, b=160),
+            xaxis_title=_('Total characters'),
+            yaxis_title=_('Label names'),
+            legend_title=_('Series'),
+            updatemenus=[dict(
+                type='buttons',
+                showactive=True,
+                active=0,
+                direction='right',
+                x=0.5, xanchor='center',
+                y=-0.14, yanchor='top',
+                bgcolor='rgba(245,245,245,0.98)',
+                bordercolor='#d0d0d0',
+                borderwidth=1,
+                pad={'l': 10, 'r': 10, 't': 6, 'b': 6},
+                buttons=[
+                    dict(
+                        label=_('Normal (Totals)'),
+                        method='update',
+                        args=[{'visible': vis_normal}, {'barmode': 'group', 'legend_title_text': _('Series')}]
+                    ),
+                    dict(
+                        label=_('Stacked (by File)'),
+                        method='update',
+                        args=[{'visible': vis_by_file}, {'barmode': 'stack', 'legend_title_text': _('File')}]
+                    ),
+                    dict(
+                        label=_('Stacked (by Coder)'),
+                        method='update',
+                        args=[{'visible': vis_by_owner}, {'barmode': 'stack', 'legend_title_text': _('Coder')}]
+                    )
+                ]
+            )],
+        )
+
+        # Final polish
+        fig.update_xaxes(showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False)
+        fig.update_yaxes(showgrid=True, gridcolor='rgba(0,0,0,0.06)')
+        fig.add_shape(
+            type='rect', xref='paper', yref='paper',
+            x0=0, y0=0, x1=1, y1=1,
+            line=dict(color='#e5e7eb', width=1),
+            fillcolor='rgba(0,0,0,0)',
+            layer='below'
+        )
+
         fig.show()
         self.helper_export_html(fig)
 
     def barchart_code_volume_by_characters(self):
-        """ Count of codes in files text by character volume. """
 
         title = _('Code text by character count')
         owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
-        values = []
-        labels = []
+
+        label_list = []
+        totals = []
+        per_label_file = []    # list of dicts: {file_name: char_sum}
+        per_label_owner = []   # list of dicts: {owner: char_sum}
+
         case_file_name, file_ids = self.get_file_ids()
         if case_file_name != "":
             subtitle += case_file_name
+
+        # Cache file names
+        file_name_cache = {}
+
+        # --- collect TOTAL (respects owner filter) + per-FILE + per-OWNER (coder) ---
         for c in self.codes:
-            sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            # Total chars per label (RESPECTS owner filter)
+            sql_total = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
             if file_ids != "":
-                sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res = cur.fetchone()
-            labels.append(c['name'])
-            values.append(res[0])
-        # Create pandas DataFrame
-        data = {'Code names': labels, 'Total characters': values}
-        df = pd.DataFrame(data)
-        mask = df['Total characters'] != 0
+                sql_total += " and fid" + file_ids
+            cur.execute(sql_total, [c['cid'], owner])
+            res_total = cur.fetchone()
+            total_chars = (res_total[0] or 0)
+
+            # Per-file breakdown (RESPECTS owner filter)
+            sql_pf = "select fid, sum(pos1 - pos0) from code_text where cid=? and owner like ?"
+            if file_ids != "":
+                sql_pf += " and fid" + file_ids
+            sql_pf += " group by fid"
+            cur.execute(sql_pf, [c['cid'], owner])
+            rows_file = cur.fetchall() or []
+
+            filedict = {}
+            for fid, s in rows_file:
+                if fid is None:
+                    continue
+                val = (s or 0)
+                if fid not in file_name_cache:
+                    try:
+                        cur2 = self.app.conn.cursor()
+                        cur2.execute("select name from source where id=?", [fid])
+                        nm = cur2.fetchone()
+                        file_name_cache[fid] = nm[0] if nm and nm[0] else f"File {fid}"
+                    except Exception:
+                        file_name_cache[fid] = f"File {fid}"
+                fname = file_name_cache[fid]
+                filedict[fname] = filedict.get(fname, 0) + val
+
+            # Per-owner (coder) breakdown (IGNORES owner filter)
+            sql_po = "select owner, sum(pos1 - pos0) from code_text where cid=?"
+            if file_ids != "":
+                sql_po += " and fid" + file_ids
+            sql_po += " group by owner"
+            cur.execute(sql_po, [c['cid']])
+            rows_owner = cur.fetchall() or []
+
+            ownerdict = {}
+            for own, s in rows_owner:
+                key = own if (own is not None and str(own).strip() != "") else _("(Unassigned)")
+                ownerdict[key] = ownerdict.get(key, 0) + (s or 0)
+
+            label_list.append(c['name'])
+            totals.append(total_chars)
+            per_label_file.append(filedict)
+            per_label_owner.append(ownerdict)
+
+        # --- DataFrame of totals; apply cutoff (on Total) ---
+        df_total = pd.DataFrame({'Label names': label_list, 'Total': totals})
+        mask = df_total['Total'] != 0
         cutoff = self.ui.lineEdit_filter.text()
         if cutoff != "":
-            mask = df['Total characters'] >= int(cutoff)
+            mask = df_total['Total'] >= int(cutoff)
             subtitle += _("Values") + " >= " + cutoff
-        fig = px.bar(df[mask], x='Total characters', y='Code names', orientation='h', title=title + subtitle)
+        df_total = df_total[mask]
+
+        if df_total.empty:
+            self.ui.textEdit.append(_("No data to display."))
+            return
+
+        # sort by total desc
+        df_total = df_total.sort_values('Total', ascending=False).reset_index(drop=True)
+
+        # Reorder dicts to match sorted labels
+        label_to_files = dict(zip(label_list, per_label_file))
+        label_to_owners = dict(zip(label_list, per_label_owner))
+        ordered_labels = df_total['Label names'].tolist()
+
+        # --- STACKED (by File): top N files across all labels + "Other" ---
+        global_file_sums = defaultdict(int)
+        for lab in ordered_labels:
+            for fname, val in label_to_files.get(lab, {}).items():
+                global_file_sums[fname] += val
+        top_files = [fname for fname, _ in sorted(global_file_sums.items(), key=lambda kv: kv[1], reverse=True)[:TOP_N_FILES]]
+
+        stack_file_rows = []
+        file_has_other = False
+        for lab in ordered_labels:
+            row = {'Label names': lab}
+            fdict = label_to_files.get(lab, {})
+            other_sum = 0
+            for fname in top_files:
+                row[fname] = fdict.get(fname, 0)
+            for fname, val in fdict.items():
+                if fname not in top_files:
+                    other_sum += val
+            if other_sum > 0:
+                row['Other (files)'] = other_sum
+                file_has_other = True
+            stack_file_rows.append(row)
+        df_stack_file = pd.DataFrame(stack_file_rows).fillna(0)
+        file_cols = top_files + (['Other (files)'] if file_has_other else [])
+
+        # --- STACKED (by Coder): top N owners across all labels + "Other" ---
+        global_owner_sums = defaultdict(int)
+        for lab in ordered_labels:
+            for own, val in label_to_owners.get(lab, {}).items():
+                global_owner_sums[own] += val
+        top_owners = [own for own, _ in sorted(global_owner_sums.items(), key=lambda kv: kv[1], reverse=True)[:TOP_N_OWNERS]]
+
+        stack_owner_rows = []
+        owner_has_other = False
+        for lab in ordered_labels:
+            row = {'Label names': lab}
+            odict = label_to_owners.get(lab, {})
+            other_sum = 0
+            for own in top_owners:
+                row[own] = odict.get(own, 0)
+            for own, val in odict.items():
+                if own not in top_owners:
+                    other_sum += val
+            if other_sum > 0:
+                row['Other (coders)'] = other_sum
+                owner_has_other = True
+            stack_owner_rows.append(row)
+        df_stack_owner = pd.DataFrame(stack_owner_rows).fillna(0)
+        owner_cols = top_owners + (['Other (coders)'] if owner_has_other else [])
+
+        # --- Build figure: Total + per-file stacks + per-owner stacks ---
+        fig = go.Figure()
+
+        # 0) Total (Normal)
+        fig.add_trace(go.Bar(
+            y=df_total['Label names'],
+            x=df_total['Total'],
+            name=_('Total'),
+            orientation='h',
+            text=df_total['Total'],
+            textposition='auto'
+        ))
+
+        # 1..F) Stacked (by File)
+        for col in file_cols:
+            fig.add_trace(go.Bar(
+                y=df_stack_file['Label names'],
+                x=df_stack_file[col],
+                name=col,
+                orientation='h',
+                text=df_stack_file[col],
+                textposition='auto'
+            ))
+
+        # F+1..end) Stacked (by Coder)
+        for col in owner_cols:
+            fig.add_trace(go.Bar(
+                y=df_stack_owner['Label names'],
+                x=df_stack_owner[col],
+                name=col,
+                orientation='h',
+                text=df_stack_owner[col],
+                textposition='auto'
+            ))
+
+        # Visibility masks
+        total_len = 1
+        file_len = len(file_cols)
+        owner_len = len(owner_cols)
+        vis_normal = [True] + [False]*file_len + [False]*owner_len
+        vis_by_file = [False] + [True]*file_len + [False]*owner_len
+        vis_by_owner = [False] + [False]*file_len + [True]*owner_len
+
+        for i, v in enumerate(vis_normal):
+            fig.data[i].visible = v
+
+        # Layout + buttons (bottom)
+        fig.update_traces(marker_line_width=0.5, marker_line_color='white')
+        fig.update_layout(
+            title={'text': f"{title}{subtitle}", 'x': 0.5, 'xanchor': 'center'},
+            template='seaborn',
+            paper_bgcolor='#f6f7fb',
+            plot_bgcolor='#f6f7fb',
+            barmode='group',
+            bargap=0.2,
+            height=640,
+            margin=dict(l=180, r=40, t=90, b=160),
+            xaxis_title=_('Total characters'),
+            yaxis_title=_('Label names'),
+            legend_title=_('Series'),
+            updatemenus=[dict(
+                type='buttons',
+                showactive=True,
+                active=0,
+                direction='right',
+                x=0.5, xanchor='center',
+                y=-0.14, yanchor='top',
+                bgcolor='rgba(245,245,245,0.98)',
+                bordercolor='#d0d0d0',
+                borderwidth=1,
+                pad={'l': 10, 'r': 10, 't': 6, 'b': 6},
+                buttons=[
+                    dict(
+                        label=_('Normal (Totals)'),
+                        method='update',
+                        args=[
+                            {'visible': vis_normal},
+                            {'barmode': 'group', 'legend_title_text': _('Series')}
+                        ]
+                    ),
+                    dict(
+                        label=_('Stacked (by File)'),
+                        method='update',
+                        args=[
+                            {'visible': vis_by_file},
+                            {'barmode': 'stack', 'legend_title_text': _('File')}
+                        ]
+                    ),
+                    dict(
+                        label=_('Stacked (by Coder)'),
+                        method='update',
+                        args=[
+                            {'visible': vis_by_owner},
+                            {'barmode': 'stack', 'legend_title_text': _('Coder')}
+                        ]
+                    )
+                ]
+            )],
+        )
+
+        # Soft grid + subtle border
+        fig.update_xaxes(showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False)
+        fig.update_yaxes(showgrid=True, gridcolor='rgba(0,0,0,0.06)')
+        fig.add_shape(
+            type='rect', xref='paper', yref='paper',
+            x0=0, y0=0, x1=1, y1=1,
+            line=dict(color='#e5e7eb', width=1),
+            fillcolor='rgba(0,0,0,0)',
+            layer='below'
+        )
+
         fig.show()
         self.helper_export_html(fig)
 
