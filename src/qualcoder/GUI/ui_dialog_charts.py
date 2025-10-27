@@ -17,16 +17,16 @@ class Ui_DialogCharts(object):
         self.label_info.setGeometry(QtCore.QRect(9, 9, 391, 22))
         self.label_info.setObjectName("label_info")
         self.label_pie = QtWidgets.QLabel(parent=DialogCharts)
-        self.label_pie.setGeometry(QtCore.QRect(10, 80, 321, 22))
+        self.label_pie.setGeometry(QtCore.QRect(10, 133, 321, 22))
         self.label_pie.setObjectName("label_pie")
         self.label_bar = QtWidgets.QLabel(parent=DialogCharts)
-        self.label_bar.setGeometry(QtCore.QRect(10, 143, 321, 22))
+        self.label_bar.setGeometry(QtCore.QRect(10, 193, 321, 22))
         self.label_bar.setObjectName("label_bar")
         self.comboBox_pie_charts = QtWidgets.QComboBox(parent=DialogCharts)
-        self.comboBox_pie_charts.setGeometry(QtCore.QRect(10, 110, 321, 25))
+        self.comboBox_pie_charts.setGeometry(QtCore.QRect(10, 160, 321, 25))
         self.comboBox_pie_charts.setObjectName("comboBox_pie_charts")
         self.comboBox_bar_charts = QtWidgets.QComboBox(parent=DialogCharts)
-        self.comboBox_bar_charts.setGeometry(QtCore.QRect(10, 170, 321, 25))
+        self.comboBox_bar_charts.setGeometry(QtCore.QRect(10, 220, 321, 25))
         self.comboBox_bar_charts.setObjectName("comboBox_bar_charts")
         #self.comboBox_sunburst_charts = QtWidgets.QComboBox(parent=DialogCharts)
         #self.comboBox_sunburst_charts.setGeometry(QtCore.QRect(10, 225, 321, 25))
@@ -123,10 +123,17 @@ class Ui_DialogCharts(object):
         self.radioButton_case = QtWidgets.QRadioButton(parent=self.groupBox)
         self.radioButton_case.setGeometry(QtCore.QRect(120, 6, 120, 22))
         self.radioButton_case.setObjectName("radioButton_case")
+         # Description text about color scheme selection
+        self.label_color_scheme_description = QtWidgets.QLabel(DialogCharts)
+        self.label_color_scheme_description.setObjectName("label_color_scheme_description")
+        self.label_color_scheme_description.setWordWrap(True)
+        self.label_color_scheme_description.setStyleSheet("color: gray; font-size: 10pt;")
+        
+        self.label_color_scheme_description.setGeometry(QtCore.QRect(10, 90, 331, 49))
 
         # Palette / theme choice under Bar charts
         self.groupBox_palette = QtWidgets.QGroupBox(parent=DialogCharts)
-        self.groupBox_palette.setGeometry(QtCore.QRect(10, 205, 331, 40))
+        self.groupBox_palette.setGeometry(QtCore.QRect(10, 65, 331, 40))
         self.groupBox_palette.setTitle("")
         self.groupBox_palette.setObjectName("groupBox_palette")
 
@@ -353,6 +360,10 @@ class Ui_DialogCharts(object):
         self.comboBox_ngrams.setToolTip(_translate("DialogCharts", "1=One word, 3=3 word phrase, 4=4 word phrase"))
         self.label_upper_count.setToolTip(_translate("DialogCharts", "<html><head/><body><p>This is to allow a wider spread of heatmap colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>"))
         self.label_upper_count.setText(_translate("DialogCharts", "Upper count limiter"))
+        self.label_color_scheme_description.setText(_translate(
+            "DialogCharts", 
+            "Before choosing a chart type, please select a color scheme: Default, Color Blind, or Corporate."
+        ))
 
 
 if __name__ == "__main__":
