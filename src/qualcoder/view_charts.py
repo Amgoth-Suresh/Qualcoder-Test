@@ -25,7 +25,8 @@ import os
 import pandas as pd
 import plotly.express as px
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
-
+from collections import defaultdict
+import plotly.graph_objects as go
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
 from .simple_wordcloud import Wordcloud
@@ -102,7 +103,11 @@ class ViewCharts(QDialog):
         self.fill_combobox_attributes()
         self.ui.radioButton_file.clicked.connect(self.fill_combobox_attributes)
         self.ui.radioButton_case.clicked.connect(self.fill_combobox_attributes)
-
+        self.ui.radioButton_default.setChecked(True)
+        self.ui.radioButton_color_blind.clicked.connect(self.update_color_palette)
+        self.ui.radioButton_default.clicked.connect(self.update_color_palette)
+        self.ui.radioButton_corporate.clicked.connect(self.update_color_palette)
+        self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
         self.files = self.app.get_filenames()
         files_combobox_list = [""]
         for f in self.files:
@@ -185,6 +190,40 @@ class ViewCharts(QDialog):
         self.ui.comboBox_heatmap.addItems(heatmap_combobox_list)
         self.ui.comboBox_heatmap.currentIndexChanged.connect(self.make_heatmap)
 
+
+    def get_color_palette(self):
+        # Check if the Colorblind radio button is checked
+        if self.ui.radioButton_color_blind.isChecked():
+            return pal_colorblind  # Colorblind-friendly palette
+        
+        # Check if the Corporate radio button is checked
+        elif self.ui.radioButton_corporate.isChecked():
+            return pal_corporate  # Corporate palette
+        
+        # Default: return None, which means the chart will use its default colors
+        else:
+            return None  # Default palette (visualization's built-in color scheme)
+
+    def update_chart(self):
+        """ This function will be called when the chart type is selected (from combo box). """
+        
+        # Get the selected color palette based on the radio button selection
+        color_palette = self.get_color_palette()
+        
+
+        # Store the selected color palette in an instance variable
+        self.selected_color_palette = color_palette  # Store it so it can be used when updating the chart
+        self.show_pie_chart()  # Call function to update the chart based on the combo box selection
+
+    def update_color_palette(self):
+        """ This function will be called when any radio button is toggled. """
+        # Get the selected color palette based on the radio button selection
+        color_palette = self.get_color_palette()
+
+        # Store the selected color palette (do not update the chart yet)
+        self.selected_color_palette = color_palette
+        print("Selected color palette:", self.selected_color_palette)
+    
     # DATA FILTERS SECTION
     def select_attributes(self):
         """ Select files based on attribute selections using DialogSecectAttributeParameters.
@@ -554,6 +593,7 @@ class ViewCharts(QDialog):
         fig.show()
         self.helper_export_html(fig)
 
+
     def barchart_code_volume_by_area(self):
         """ Codes by image area volume. """
 
@@ -624,18 +664,169 @@ class ViewCharts(QDialog):
         chart_type_index = self.ui.comboBox_pie_charts.currentIndex()
         if chart_type_index < 1:
             return
+        color_palette = self.selected_color_palette
+        print("Color palette in update_selected_chart:", color_palette)
         self.get_selected_categories_and_codes()
         if chart_type_index == 1:  # Code frequency
-            self.piechart_code_frequency()
+            self.hierarchy_code_frequency(color_palette)
         if chart_type_index == 2:  # Code by characters
-            self.piechart_code_volume_by_characters1()
+            self.piechart_code_volume_by_characters(color_palette)
         #if chart_type_index == 3:  # Code by image area
             #self.piechart_code_volume_by_area()
         #if chart_type_index == 4:  # Code by audio/video segments
            # self.piechart_code_volume_by_segments()
         self.ui.comboBox_pie_charts.setCurrentIndex(0)
-    def piechart_code_volume_by_characters1(self):
 
+    def hierarchy_code_frequency(self, color_palette=None):
+        """ Code for rendering the hierarchy chart, using the selected color palette. """
+        title = "Chart of Label and Category Counts"
+        owner, subtitle = self.owner_and_subtitle_helper()
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name:
+            subtitle += case_file_name
+
+        # --- gather coded cids from DB (text, image, av) ---
+        coded = []
+        cur = self.app.conn.cursor()
+        for table, id_field in [("code_text", "fid"), ("code_image", "id"), ("code_av", "id")]:
+            sql = f"SELECT cid FROM {table} WHERE owner LIKE ?"
+            if file_ids:
+                sql += f" AND {id_field}" + file_ids
+            cur.execute(sql, [owner])
+            coded.extend(cur.fetchall())
+
+        # --- code counts ---
+        cid_counts = {}
+        for (cid,) in coded:
+            cid_counts[cid] = cid_counts.get(cid, 0) + 1
+        for code in self.codes:
+            code["count"] = cid_counts.get(code["cid"], 0)
+
+        # --- category lookups ---
+        parentid_by_id = {c["catid"]: c.get("supercatid") for c in self.categories}
+        name_by_id     = {c["catid"]: c["name"] for c in self.categories}
+        top_names      = [c["name"] for c in self.categories if not c.get("supercatid")]  # center nodes
+
+        def topcat_name(catid):
+            cur = catid
+            seen = set()
+            while parentid_by_id.get(cur):
+                if cur in seen:  # safety
+                    break
+                seen.add(cur)
+                cur = parentid_by_id[cur]
+            return name_by_id.get(cur, "")
+
+        # --- build children (codes → top category) and center values (sum of their codes) ---
+        top_sums = {}
+        children = []
+        for code in self.codes:
+            cnt = int(code.get("count", 0))
+            if cnt == 0:
+                continue
+            top = topcat_name(code.get("catid"))
+            top_sums[top] = top_sums.get(top, 0) + cnt
+            children.append({"item": code["name"], "value": cnt, "parent": top})
+
+        centers = [{"item": nm, "value": int(top_sums.get(nm, 0)), "parent": ""} for nm in top_names]
+        df = pd.DataFrame(centers + children)
+
+        # --- optional cutoff (keep centers; filter children) ---
+        cutoff = self.ui.lineEdit_filter.text()
+        if cutoff:
+            try:
+                thr = int(cutoff)
+                centers_df = df[df["parent"] == ""]
+                kids_df    = df[df["parent"] != ""]
+                kids_df    = kids_df[kids_df["value"] >= thr]
+                df = pd.concat([centers_df, kids_df], ignore_index=True)
+                subtitle += f" (Values ≥ {cutoff})"
+            except ValueError:
+                pass
+
+        # --- POST-FILTER FIX: ensure every center has children & parent equals sum(children) ---
+        centers_df = df[df["parent"] == ""].copy()
+        kids_df    = df[df["parent"] != ""].copy()
+
+        # recompute child sums by parent using remaining kids
+        child_sums = kids_df.groupby("parent")["value"].sum().to_dict()
+
+        fixed_centers = []
+        extra_kids = []
+
+        for _, c in centers_df.iterrows():
+            name = c["item"]
+            sum_children = int(child_sums.get(name, 0))
+
+            if sum_children > 0:
+                # align parent value to children sum
+                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": sum_children})
+            else:
+                # no children -> create a duplicate child, give it a minimal positive value
+                dup_val = max(int(c["value"]), 1)
+                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": dup_val})
+                extra_kids.append({"id": f"dup::{name}", "parent_id": f"cat::{name}", "item": name, "value": dup_val})
+
+        fixed_kids = []
+        for _, r in kids_df.iterrows():
+            fixed_kids.append({
+                "id": f"code::{r['item']}::{r['parent']}",
+                "parent_id": f"cat::{r['parent']}",
+                "item": r["item"],
+                "value": int(r["value"])
+            })
+
+        d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
+
+        # consistent colors: children share topcat color (use parent_id for grouping)
+        def color_group(row):
+            return row["id"] if row["parent_id"] == "" else row["parent_id"]
+        d2["color_group"] = d2.apply(color_group, axis=1)
+
+        # --- plot (exactly two levels; full outer ring) ---
+        fig = px.sunburst(
+            d2,
+            ids="id",               # unique ids prevent label-merge
+            parents="parent_id",
+            names="item",
+            values="value",
+            color="color_group",  # Apply the color grouping
+            branchvalues="total",   # parent size == sum(children)
+            maxdepth=2,
+            title=title + " " + subtitle
+        )
+
+        # Apply the selected color palette (if provided)
+        if color_palette:
+            if isinstance(color_palette, list):  # For discrete color sequences
+                fig.update_traces(marker=dict(colors=color_palette))  # Apply discrete color palette
+            else:
+                fig.update_traces(marker=dict(colorscale=color_palette))  # Apply continuous color scale
+        else:
+            fig.update_traces(marker=dict(colorscale="Viridis"))  # Default color palette if None
+
+        fig.update_traces(
+            insidetextorientation="radial",
+            hovertemplate="<b>%{label}</b><br>"
+                        "Parent: %{parent}<br>"
+                        "Count: %{value}<br>"
+                        "% of parent: %{percentParent:.1%}<br>"
+                        "% of total: %{percentRoot:.1%}<extra></extra>"
+        )
+
+        fig.update_layout(
+            uniformtext_minsize=10,
+            uniformtext_mode="hide",
+            margin=dict(l=0, r=0, t=60, b=0),
+            showlegend=False
+        )
+
+        fig.show()
+        self.helper_export_html(fig)
+
+
+    def piechart_code_volume_by_characters(self, color_palette=None):
+        """ Code for rendering the pie chart of label text by character count, using the selected color palette. """
         title = 'Label text by character count'
         owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
@@ -753,6 +944,16 @@ class ViewCharts(QDialog):
             maxdepth=2,
             title=title + " " + subtitle
         )
+
+        # Apply the selected color palette (if provided)
+        if color_palette:
+            if isinstance(color_palette, list):  # For discrete color sequences
+                fig.update_traces(marker=dict(colors=color_palette))  # Apply discrete color palette
+            else:
+                fig.update_traces(marker=dict(colorscale=color_palette))  # Apply continuous color scale
+        else:
+            fig.update_traces(marker=dict(colorscale="Viridis"))  # Default color palette if None
+
         fig.update_traces(
             insidetextorientation="radial",
             hovertemplate="<b>%{label}</b><br>"
@@ -761,6 +962,7 @@ class ViewCharts(QDialog):
                         "% of parent: %{percentParent:.1%}<br>"
                         "% of total: %{percentRoot:.1%}<extra></extra>"
         )
+
         fig.update_layout(
             uniformtext_minsize=10,
             uniformtext_mode="hide",
@@ -771,176 +973,6 @@ class ViewCharts(QDialog):
         fig.show()
         self.helper_export_html(fig)
 
-    
-
-
-    def hierarchy_code_frequency(self):
-
-        title = "Chart of Label and Category Counts"
-        owner, subtitle = self.owner_and_subtitle_helper()
-        case_file_name, file_ids = self.get_file_ids()
-        if case_file_name:
-            subtitle += case_file_name
-
-        # --- gather coded cids from DB (text, image, av) ---
-        coded = []
-        cur = self.app.conn.cursor()
-        for table, id_field in [("code_text", "fid"), ("code_image", "id"), ("code_av", "id")]:
-            sql = f"SELECT cid FROM {table} WHERE owner LIKE ?"
-            if file_ids:
-                sql += f" AND {id_field}" + file_ids
-            cur.execute(sql, [owner])
-            coded.extend(cur.fetchall())
-
-        # --- code counts ---
-        cid_counts = {}
-        for (cid,) in coded:
-            cid_counts[cid] = cid_counts.get(cid, 0) + 1
-        for code in self.codes:
-            code["count"] = cid_counts.get(code["cid"], 0)
-
-        # --- category lookups ---
-        parentid_by_id = {c["catid"]: c.get("supercatid") for c in self.categories}
-        name_by_id     = {c["catid"]: c["name"] for c in self.categories}
-        top_names      = [c["name"] for c in self.categories if not c.get("supercatid")]  # center nodes
-
-        def topcat_name(catid):
-            cur = catid
-            seen = set()
-            while parentid_by_id.get(cur):
-                if cur in seen:  # safety
-                    break
-                seen.add(cur)
-                cur = parentid_by_id[cur]
-            return name_by_id.get(cur, "")
-
-        # --- build children (codes → top category) and center values (sum of their codes) ---
-        top_sums = {}
-        children = []
-        for code in self.codes:
-            cnt = int(code.get("count", 0))
-            if cnt == 0:
-                continue
-            top = topcat_name(code.get("catid"))
-            top_sums[top] = top_sums.get(top, 0) + cnt
-            children.append({"item": code["name"], "value": cnt, "parent": top})
-
-        centers = [{"item": nm, "value": int(top_sums.get(nm, 0)), "parent": ""} for nm in top_names]
-        df = pd.DataFrame(centers + children)
-
-        # --- optional cutoff (keep centers; filter children) ---
-        cutoff = self.ui.lineEdit_filter.text()
-        if cutoff:
-            try:
-                thr = int(cutoff)
-                centers_df = df[df["parent"] == ""]
-                kids_df    = df[df["parent"] != ""]
-                kids_df    = kids_df[kids_df["value"] >= thr]
-                df = pd.concat([centers_df, kids_df], ignore_index=True)
-                subtitle += f" (Values ≥ {cutoff})"
-            except ValueError:
-                pass
-
-        # --- POST-FILTER FIX: ensure every center has children & parent equals sum(children) ---
-        centers_df = df[df["parent"] == ""].copy()
-        kids_df    = df[df["parent"] != ""].copy()
-
-        # recompute child sums by parent using remaining kids
-        child_sums = kids_df.groupby("parent")["value"].sum().to_dict()
-
-        fixed_centers = []
-        extra_kids = []
-
-        for _, c in centers_df.iterrows():
-            name = c["item"]
-            sum_children = int(child_sums.get(name, 0))
-
-            if sum_children > 0:
-                # align parent value to children sum
-                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": sum_children})
-            else:
-                # no children -> create a duplicate child, give it a minimal positive value
-                dup_val = max(int(c["value"]), 1)
-                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": dup_val})
-                extra_kids.append({"id": f"dup::{name}", "parent_id": f"cat::{name}", "item": name, "value": dup_val})
-
-        # rebuild kids with stable unique ids and parent ids (cat::<topname>)
-        fixed_kids = []
-        for _, r in kids_df.iterrows():
-            fixed_kids.append({
-                "id": f"code::{r['item']}::{r['parent']}",
-                "parent_id": f"cat::{r['parent']}",
-                "item": r["item"],
-                "value": int(r["value"])
-            })
-
-        d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
-
-        # consistent colors: children share topcat color (use parent_id for grouping)
-        def color_group(row):
-            return row["id"] if row["parent_id"] == "" else row["parent_id"]
-        d2["color_group"] = d2.apply(color_group, axis=1)
-
-        # --- plot (exactly two levels; full outer ring) ---
-        fig = px.sunburst(
-            d2,
-            ids="id",               # unique ids prevent label-merge
-            parents="parent_id",
-            names="item",
-            values="value",
-            color="color_group",
-            branchvalues="total",   # parent size == sum(children)
-            maxdepth=2,
-            title=title + " " + subtitle
-        )
-        fig.update_traces(
-            insidetextorientation="radial",
-            hovertemplate="<b>%{label}</b><br>"
-                        "Parent: %{parent}<br>"
-                        "Count: %{value}<br>"
-                        "% of parent: %{percentParent:.1%}<br>"
-                        "% of total: %{percentRoot:.1%}<extra></extra>"
-        )
-        fig.update_layout(
-            uniformtext_minsize=10,
-            uniformtext_mode="hide",
-            margin=dict(l=0, r=0, t=60, b=0),
-            showlegend=False
-        )
-
-        fig.show()
-        self.helper_export_html(fig)
-
-    def piechart_code_volume_by_characters(self):
-        """ Count of codes in files text by character volume. """
-
-        title = _('Code text by character count')
-        owner, subtitle = self.owner_and_subtitle_helper()
-        cur = self.app.conn.cursor()
-        values = []
-        labels = []
-        case_file_name, file_ids = self.get_file_ids()
-        if case_file_name != "":
-            subtitle += case_file_name
-        for c in self.codes:
-            sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
-            if file_ids != "":
-                sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
-            cur.execute(sql, [c['cid'], owner])
-            res = cur.fetchone()
-            labels.append(c['name'])
-            values.append(res[0])
-        # Create pandas DataFrame
-        data = {'Code names': labels, 'Total characters': values}
-        df = pd.DataFrame(data)
-        cutoff = self.ui.lineEdit_filter.text()
-        mask = df['Total characters'] != 0
-        if cutoff != "":
-            mask = df['Total characters'] >= int(cutoff)
-            subtitle += _("Values") + " >= " + cutoff
-        fig = px.pie(df[mask], values='Total characters', names='Code names', title=title + subtitle)
-        fig.show()
-        self.helper_export_html(fig)
 
     def piechart_code_volume_by_area(self):
         """ Codes by image area volume. """
