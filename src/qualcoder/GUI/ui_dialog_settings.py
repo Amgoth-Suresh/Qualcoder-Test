@@ -288,7 +288,7 @@ class Ui_Dialog_settings(object):
         self.gridLayout_4.addItem(spacerItem2, 5, 1, 1, 1)
         self.horizontalLayout.addWidget(self.widget_ui_right)
         self.gridLayout.addWidget(self.widget_ui, 2, 0, 1, 3)
-        self.widget_ai = QtWidgets.QWidget(parent=self.scrollAreaWidgetContents)
+        '''self.widget_ai = QtWidgets.QWidget(parent=self.scrollAreaWidgetContents)
         self.widget_ai.setStyleSheet("")
         self.widget_ai.setObjectName("widget_ai")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget_ai)
@@ -512,7 +512,8 @@ class Ui_Dialog_settings(object):
         self.horizontalLayout_4.addItem(spacerItem7)
         self.verticalLayout_3.addWidget(self.widget_2)
         self.verticalLayout_2.addWidget(self.widget_AI_advanced_options)
-        self.gridLayout.addWidget(self.widget_ai, 10, 0, 1, 3)
+        self.gridLayout.addWidget(self.widget_ai, 10, 0, 1, 3)'''
+
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout.addWidget(self.scrollArea)
         self.buttonBox = QtWidgets.QDialogButtonBox(parent=Dialog_settings)
@@ -522,6 +523,7 @@ class Ui_Dialog_settings(object):
         self.verticalLayout.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog_settings)
+        # The following connections were commented out in your previous code. Uncommenting them is generally safe.
         self.buttonBox.accepted.connect(Dialog_settings.accept) # type: ignore
         self.buttonBox.rejected.connect(Dialog_settings.reject) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(Dialog_settings)
@@ -593,7 +595,7 @@ class Ui_Dialog_settings(object):
         self.label_5.setText(_translate("Dialog_settings", "Time format"))
         self.label_6.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Used when entering speaker name in transcription</p></body></html>"))
         self.label_6.setText(_translate("Dialog_settings", "Speaker format"))
-        self.label_ai_integration.setText(_translate("Dialog_settings", "AI Integration"))
+        '''self.label_ai_integration.setText(_translate("Dialog_settings", "AI Integration"))
         self.checkBox_AI_enable.setText(_translate("Dialog_settings", "enable AI integration"))
         self.label_11.setText(_translate("Dialog_settings", "Description:"))
         self.label_12.setText(_translate("Dialog_settings", "Get Access:"))
@@ -610,7 +612,7 @@ class Ui_Dialog_settings(object):
         self.label_14.setText(_translate("Dialog_settings", "Large Model:"))
         self.comboBox_AI_model_fast.setToolTip(_translate("Dialog_settings", "Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only."))
         self.comboBox_AI_model_fast.setPlaceholderText(_translate("Dialog_settings", "<select available model>"))
-        self.label_15.setText(_translate("Dialog_settings", "   Fast Model:"))
+        self.label_15.setText(_translate("Dialog_settings", "  Fast Model:"))
         self.label_ai_large_contex_window.setText(_translate("Dialog_settings", "context window:"))
         self.comboBox_AI_model_large.setToolTip(_translate("Dialog_settings", "Select an available AI model. The large model is used for most of the AI features in QualCoder."))
         self.comboBox_AI_model_large.setPlaceholderText(_translate("Dialog_settings", "<select available model>"))
@@ -619,6 +621,6 @@ class Ui_Dialog_settings(object):
         self.lineEdit_ai_temperature.setToolTip(_translate("Dialog_settings", "Advanced option. Only change when you know whatr you are doing."))
         self.lineEdit_ai_temperature.setInputMask(_translate("Dialog_settings", "D.9"))
         self.lineEdit_ai_temperature.setText(_translate("Dialog_settings", "1.0"))
-        self.label_9.setText(_translate("Dialog_settings", "   Top_p:"))
+        self.label_9.setText(_translate("Dialog_settings", "  Top_p:"))
         self.lineEdit_top_p.setInputMask(_translate("Dialog_settings", "D.9"))
-        self.lineEdit_top_p.setText(_translate("Dialog_settings", "1.0"))
+        self.lineEdit_top_p.setText(_translate("Dialog_settings", "1.0"))'''

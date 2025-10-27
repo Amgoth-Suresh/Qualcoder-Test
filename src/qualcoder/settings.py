@@ -28,7 +28,7 @@ import re
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import Message
-from .ai_llm import get_available_models
+# from .ai_llm import get_available_models  # COMMENTED OUT: AI related import
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -41,11 +41,12 @@ class DialogSettings(QtWidgets.QDialog):
     settings = {}
     current_coder = "default"
 
+    # The 'enable_ai' parameter is no longer needed since AI is removed
     def __init__(self, app, parent=None, section=None, enable_ai=False):
 
         self.app = app
         self.settings = app.settings
-        self.ai_models = copy.deepcopy(self.app.ai_models)
+        # self.ai_models = copy.deepcopy(self.app.ai_models)  # COMMENTED OUT: AI related variable
         self.current_coder = self.app.settings['codername']
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
@@ -58,19 +59,26 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_current_coder.setText(_("Current coder: ") + self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
         # Get coder names from all tables
-        sql = "select owner from  code_image union select owner from code_text union select owner from code_av "
-        sql += " union select owner from cases union select owner from journal union select owner from attribute "
-        sql += "union select owner from source union select owner from annotation union select owner from code_name "
-        sql += "union select owner from code_cat"
         coders = [""]
         if self.app.conn is not None:
-            cur = self.app.conn.cursor()
-            cur.execute(sql)
-            results = cur.fetchall()
-            for row in results:
-                if row[0] != "":
-                    coders.append(row[0])
+            sql = "select owner from  code_image union select owner from code_text union select owner from code_av "
+            sql += " union select owner from cases union select owner from journal union select owner from attribute "
+            sql += "union select owner from source union select owner from annotation union select owner from code_name "
+            sql += "union select owner from code_cat"
+            try:
+                cur = self.app.conn.cursor()
+                cur.execute(sql) # <-- This is where the OperationalError occurs
+                results = cur.fetchall()
+                for row in results:
+                    if row[0] != "":
+                        coders.append(row[0])
+            except Exception as e:
+                # Log the error but continue with just the default empty coder list
+                logger.error("Failed to query coder names from database: " + str(e))
+                # coders remains [""]
+                
         self.ui.comboBox_coders.addItems(coders)
+        
         languages = ["Deutsch de", "English en", "Español es", "Français fr",
                      "Italiano it", "日本語 ja", "Português pt", "Svenska sv", "中国人 zh"]
         self.ui.comboBox_language.addItems(languages)
@@ -91,27 +99,27 @@ class DialogSettings(QtWidgets.QDialog):
 
         #self.ui.spinBox.setValue(self.settings['fontsize'])
         index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_fontsize.setCurrentIndex(index)
 
         #self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         index = self.ui.comboBox_codetreefontsize.findText(str(self.settings['treefontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_codetreefontsize.setCurrentIndex(index)
 
         index = self.ui.comboBox_docfontsize.findText(str(self.settings['docfontsize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_docfontsize.setCurrentIndex(index)
 
         self.ui.comboBox_coders.currentIndexChanged.connect(self.combobox_coder_changed)
         index = self.ui.comboBox_text_chunk_size.findText(str(self.settings['codetext_chunksize']),
-                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_text_chunk_size.setCurrentIndex(index)
@@ -136,7 +144,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setChecked(False)
 
         index = self.ui.comboBox_backups.findText(str(self.settings['backup_num']),
-                                                      QtCore.Qt.MatchFlag.MatchFixedString)
+                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_backups.setCurrentIndex(index)
@@ -151,7 +159,7 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ui.comboBox_text_style.setCurrentIndex(index)
 
         index = self.ui.comboBox_surrounding_chars.findText(str(self.settings['report_text_context_characters']),
-                                                      QtCore.Qt.MatchFlag.MatchFixedString)
+                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_surrounding_chars.setCurrentIndex(index)
@@ -159,6 +167,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
         # AI options
+        '''
         if enable_ai or self.settings['ai_enable'] == 'True':
             self.ui.checkBox_AI_enable.setChecked(True)
         else:
@@ -193,7 +202,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_ai_fast_context_window.textChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_large.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_fast.currentTextChanged.connect(self.ai_model_parameters_changed)
-        self.ui.comboBox_AI_model_large.view().setMinimumWidth(500)  # Set a minimum width for the dropdown list
+        self.ui.comboBox_AI_model_large.view().setMinimumWidth(500) 
         self.ui.comboBox_AI_model_fast.view().setMinimumWidth(500)
         self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
         self.ui.checkBox_AI_language_ui.setChecked(self.settings.get('ai_language_ui', 'True') == 'True')
@@ -213,12 +222,13 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum())
             # Use QTimers to briefly flash a yellow border around the AI settings
             QtCore.QTimer.singleShot(200, lambda:self.ui.widget_ai.setStyleSheet('#widget_ai {\n'
-                                                                                  '   border: 3px solid yellow; \n'
-                                                                                  '   border-radius: 5px; \n'
-                                                                                  '}'))
+                                                                                '   border: 3px solid yellow; \n'
+                                                                                '   border-radius: 5px; \n'
+                                                                                '}'))
             QtCore.QTimer.singleShot(700, lambda: self.ui.widget_ai.setStyleSheet('#widget_ai { border: none; }'))
         else:
             self.ui.widget_ai.setStyleSheet('')
+        '''
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -228,6 +238,8 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.checkBox_backup_AV_files.setEnabled(False)
     
+    # COMMENTED OUT: AI related method
+    '''
     def ai_enable_state_changed(self):
         self.ui.comboBox_ai_profile.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
@@ -238,7 +250,10 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
+    '''
     
+    # COMMENTED OUT: AI related method
+    '''
     def ai_profile_changed(self):
         self.settings['ai_model_index'] = self.ui.comboBox_ai_profile.currentIndex()
         if int(self.settings['ai_model_index']) >= 0:
@@ -256,7 +271,7 @@ class DialogSettings(QtWidgets.QDialog):
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_large_context_window):
                 self.ui.lineEdit_ai_large_context_window.setText(curr_ai_model['large_model_context_window'])
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_fast_context_window):
-                self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])            
+                self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window']) 
         else:
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
@@ -265,9 +280,12 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_AI_model_large.setCurrentText('')
             self.ui.comboBox_AI_model_fast.setCurrentText('')
             self.ui.lineEdit_ai_large_context_window.setText('')
-            self.ui.lineEdit_ai_fast_context_window.setText('')            
-        self.ai_update_avaliable_models()     
-        
+            self.ui.lineEdit_ai_fast_context_window.setText('') 
+        self.ai_update_avaliable_models() 
+    '''
+    
+    # COMMENTED OUT: AI related method
+    '''
     def ai_profile_name_edit(self):
         if int(self.settings['ai_model_index']) < 0:
             Message.warning(self, _('Edit AI profile name'), _('Select a profile first. \n'
@@ -277,11 +295,11 @@ class DialogSettings(QtWidgets.QDialog):
             return
         curr_name = self.ai_models[int(self.settings['ai_model_index'])]['name']
         new_name, ok = QtWidgets.QInputDialog.getText(
-            self,                                     # parent
-            _('Edit AI profile name'),                # title
-            _('Enter new profile name:'),             # label
-            QtWidgets.QLineEdit.EchoMode.Normal,      # echo
-            curr_name                                 # text
+            self, 
+            _('Edit AI profile name'), 
+            _('Enter new profile name:'), 
+            QtWidgets.QLineEdit.EchoMode.Normal, 
+            curr_name 
         )
         if ok and new_name != '':
             # clean up new name for use in ini file
@@ -299,13 +317,16 @@ class DialogSettings(QtWidgets.QDialog):
             while candidate in existing_names: # Find next available unique name: new_name_1, new_name_2, etc.
                 candidate = f"{new_name}_{i}"
                 i += 1
-            new_name = candidate            
+            new_name = candidate 
             
             self.ai_models[int(self.settings['ai_model_index'])]['name'] = new_name
             with QtCore.QSignalBlocker(self.ui.comboBox_ai_profile): 
                 self.ui.comboBox_ai_profile.setItemText(int(self.settings['ai_model_index']), new_name)
                 self.ui.comboBox_ai_profile.setCurrentText = new_name
+    '''
         
+    # COMMENTED OUT: AI related method
+    '''
     def ai_model_parameters_changed(self):
         """Called if the selected large or fast model has changed or if one of the 
         context window numbers has been altered."""
@@ -320,13 +341,19 @@ class DialogSettings(QtWidgets.QDialog):
             if self.ui.lineEdit_ai_fast_context_window.text() != '':
                 self.ai_models[ai_model_index]['fast_model_context_window'] = self.ui.lineEdit_ai_fast_context_window.text()
             else:
-                self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default        
+                self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default 
+    '''
 
+    # COMMENTED OUT: AI related method
+    '''
     def ai_api_key_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
-            self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = self.ui.lineEdit_ai_api_key.text()   
-        self.ai_update_avaliable_models()     
+            self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = self.ui.lineEdit_ai_api_key.text() 
+        self.ai_update_avaliable_models() 
+    '''
 
+    # COMMENTED OUT: AI related method
+    '''
     def ai_update_avaliable_models(self):
         if not self.ui.widget_AI_advanced_options.isVisible():
             return
@@ -349,26 +376,37 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_AI_model_fast.addItems(model_list)
         self.ui.comboBox_AI_model_fast.setCurrentText(curr_model_fast)
         self.ui.comboBox_AI_model_fast.lineEdit().setCursorPosition(0)
+    '''
 
+    # COMMENTED OUT: AI related method
+    '''
     def adjust_ai_models_comboboxes(self):
         # Adjust the width of the AI models ComboBox
         self.ui.comboBox_AI_model_large.setMaximumWidth(self.ui.label_ai_large_contex_window.width() + 6 + self.ui.lineEdit_ai_large_context_window.width())
-        self.ui.comboBox_AI_model_fast.setMaximumWidth(self.ui.label_ai_fast_contex_window.width() + 6 + self.ui.lineEdit_ai_fast_context_window.width())        
+        self.ui.comboBox_AI_model_fast.setMaximumWidth(self.ui.label_ai_fast_contex_window.width() + 6 + self.ui.lineEdit_ai_fast_context_window.width()) 
+    '''
 
+    # COMMENTED OUT: Calls to AI related method in inherited methods
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.adjust_ai_models_comboboxes()
+        # self.adjust_ai_models_comboboxes()
 
+    # COMMENTED OUT: Calls to AI related method in inherited methods
     def showEvent(self, event):
         super().showEvent(event)
-        self.adjust_ai_models_comboboxes()
+        # self.adjust_ai_models_comboboxes()
 
+    # COMMENTED OUT: AI related method
+    '''
     def ai_language_ui_changed(self):
         self.ui.lineEdit_AI_language.setEnabled(not self.ui.checkBox_AI_language_ui.isChecked())
         if not self.ui.checkBox_AI_language_ui.isChecked():
             self.ui.lineEdit_AI_language.setFocus()
             self.ui.lineEdit_AI_language.selectAll()
-                
+    '''
+            
+    # COMMENTED OUT: AI related method
+    '''
     def validate_ai_temperature(self):
         text = self.ui.lineEdit_ai_temperature.text()
         # Check if the input text is numeric
@@ -379,7 +417,10 @@ class DialogSettings(QtWidgets.QDialog):
             Message.warning(self, "Invalid input", "AI temperature parameter must be between 0.0 and 2.0.")
             self.ui.lineEdit_ai_temperature.setFocus()
             self.ui.lineEdit_ai_temperature.selectAll()
+    '''
             
+    # COMMENTED OUT: AI related method
+    '''
     def validate_ai_top_p(self):
         text = self.ui.lineEdit_top_p.text()
         # Check if the input text is numeric
@@ -390,6 +431,7 @@ class DialogSettings(QtWidgets.QDialog):
             Message.warning(self, "Invalid input", "AI top_p parameter must be between 0.0 and 1.0.")
             self.ui.lineEdit_top_p.setFocus()
             self.ui.lineEdit_top_p.selectAll()
+    '''
             
     def new_coder_entered(self):
         """ New coder name entered.
@@ -421,6 +463,8 @@ class DialogSettings(QtWidgets.QDialog):
             return
         self.ui.label_directory.setText(directory)
         
+    # COMMENTED OUT: AI related method
+    '''
     def toggle_ai_advanced_options(self):
         if self.ui.pushButton_advanced_AI_options.isChecked():
             self.ui.widget_AI_advanced_options.show()
@@ -428,6 +472,7 @@ class DialogSettings(QtWidgets.QDialog):
             QtCore.QTimer.singleShot(100, lambda: self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum()))
         else:
             self.ui.widget_AI_advanced_options.hide()
+    '''
 
     def accept(self):
         restart_qualcoder = False
@@ -473,6 +518,7 @@ class DialogSettings(QtWidgets.QDialog):
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
         # AI settings
+        '''
         if self.ui.checkBox_AI_enable.isChecked():
             self.settings['ai_enable'] = 'True'
         else:
@@ -501,6 +547,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()
         self.settings['ai_top_p'] = self.ui.lineEdit_top_p.text()
+        '''
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
@@ -511,4 +558,5 @@ class DialogSettings(QtWidgets.QDialog):
         Each setting has a variable identifier then a colon
         followed by the value. """
 
-        self.app.write_config_ini(self.settings, self.ai_models)
+        self.app.write_config_ini(self.settings, 
+                                  None) # Changed self.ai_models to None, as it's no longer used
