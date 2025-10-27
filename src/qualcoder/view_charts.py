@@ -108,6 +108,9 @@ class ViewCharts(QDialog):
         self.ui.radioButton_default.clicked.connect(self.update_color_palette)
         self.ui.radioButton_corporate.clicked.connect(self.update_color_palette)
         self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
+        self.ui.comboBox_bar_charts.currentIndexChanged.connect(self.show_bar_chart)
+        self.selected_color_palette = None
+        self.update_color_palette()
         self.files = self.app.get_filenames()
         files_combobox_list = [""]
         for f in self.files:
@@ -121,7 +124,6 @@ class ViewCharts(QDialog):
         self.ui.comboBox_case.currentIndexChanged.connect(self.clear_combobox_files)
         self.ui.comboBox_file.currentIndexChanged.connect(self.clear_combobox_cases)
         self.get_selected_categories_and_codes()
-        self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
         pie_combobox_list = ['', _('Label frequency'),
                              _('Label by characters'),
                              #_('Label by image area'),
@@ -214,6 +216,7 @@ class ViewCharts(QDialog):
         # Store the selected color palette in an instance variable
         self.selected_color_palette = color_palette  # Store it so it can be used when updating the chart
         self.show_pie_chart()  # Call function to update the chart based on the combo box selection
+        self.show_bar_chart()
 
     def update_color_palette(self):
         """ This function will be called when any radio button is toggled. """
@@ -508,9 +511,13 @@ class ViewCharts(QDialog):
         chart_type_index = self.ui.comboBox_bar_charts.currentIndex()
         if chart_type_index < 1:
             return
+        color_palette = self.selected_color_palette
+
+        print("Color palette in update_selected_chart:", color_palette)
+
         self.get_selected_categories_and_codes()
         if chart_type_index == 1:  # Code frequency
-            self.barchart_code_frequency()
+            self.barchart_code_frequency_new(color_palette)
         if chart_type_index == 2:  # Code by characters
             self.barchart_code_volume_by_characters()
         if chart_type_index == 3:  # Code by image area
@@ -518,18 +525,187 @@ class ViewCharts(QDialog):
         if chart_type_index == 4:  # Code by audio/video segments
             self.barchart_code_volume_by_segments()
         self.ui.comboBox_bar_charts.setCurrentIndex(0)
-
-    def barchart_code_frequency(self):
-        """ Count of codes across text, images and A/V.
-        """
-
-        title = _('Code count - text, images and Audio/Video')
+    
+    def barchart_code_frequency_new(self, color_palette=None):
+        """Counts per code with palette toggles: Normal/Stacked × Default/Corporate/Color-blind."""
+        title = _('Label count - text, images and Audio/Video')
         owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
-        values = []
-        labels = []
+
+        labels, text_counts, image_counts, av_counts = [], [], [], []
+
         case_file_name, file_ids = self.get_file_ids()
         if case_file_name != "":
+            subtitle += case_file_name
+
+        # --- collect counts per code for Text / Image / A/V ---
+        for c in self.codes:
+            # Text
+            sql = "select count(cid) from code_text where cid=? and owner like ?"
+            if file_ids != "":
+                sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
+            cur.execute(sql, [c['cid'], owner])
+            res_text = cur.fetchone()
+
+            # Image
+            sql = "select count(cid) from code_image where cid=? and owner like ?"
+            if file_ids != "":
+                sql = "select count(cid) from code_image where cid=? and owner like ? and id" + file_ids
+            cur.execute(sql, [c['cid'], owner])
+            res_image = cur.fetchone()
+
+            # A/V
+            sql = "select count(cid) from code_av where cid=? and owner like ?"
+            if file_ids != "":
+                sql = "select count(cid) from code_av where cid=? and owner like ? and id" + file_ids
+            cur.execute(sql, [c['cid'], owner])
+            res_av = cur.fetchone()
+
+            labels.append(c['name'])
+            text_counts.append((res_text[0] or 0))
+            image_counts.append((res_image[0] or 0))
+            av_counts.append((res_av[0] or 0))
+
+        # --- dataframe + cutoff filter based on TOTAL (like your original) ---
+        df = pd.DataFrame({
+            'Label names': labels,
+            'Text': text_counts,
+            'Image': image_counts,
+            'A/V': av_counts
+        })
+        df['Total'] = df[['Text', 'Image', 'A/V']].sum(axis=1)
+
+        df = df[df['Total'] > 0]
+        cutoff = self.ui.lineEdit_filter.text()
+        if cutoff != "":
+            df = df[df['Total'] >= int(cutoff)]
+            subtitle += _(" Values") + " >= " + cutoff
+
+        if df.empty:
+            self.ui.textEdit.append(_("No data to display."))
+            return
+
+        df = df.sort_values('Total', ascending=False)
+
+        # Use the helper function to get the selected color palette (Default, Colorblind, or Corporate)
+        if color_palette is None:
+            color_palette = self.get_color_palette()
+
+        # --- build traces: 1 Total (for Normal), plus 3 components (for Stacked) ---
+        # For stacked, use the same color order for each series
+        total_trace = go.Bar(
+            y=df['Label names'],
+            x=df['Total'],
+            name=_('Total'),
+            orientation='h',
+            text=df['Total'],
+            textposition='auto',
+            marker=dict(color=color_palette)  # Apply selected color palette here
+        )
+        text_trace = go.Bar(
+            y=df['Label names'],
+            x=df['Text'],
+            name=_('Text'),
+            orientation='h',
+            text=df['Text'],
+            textposition='auto',
+            marker=dict(color=color_palette)
+        )
+        image_trace = go.Bar(
+            y=df['Label names'],
+            x=df['Image'],
+            name=_('Image'),
+            orientation='h',
+            text=df['Image'],
+            textposition='auto',
+            marker=dict(color=color_palette)
+        )
+        av_trace = go.Bar(
+            y=df['Label names'],
+            x=df['A/V'],
+            name=_('Audio/Video'),
+            orientation='h',
+            text=df['A/V'],
+            textposition='auto',
+            marker=dict(color=color_palette)
+        )
+
+        fig = go.Figure(data=[total_trace, text_trace, image_trace, av_trace])
+
+        fig.update_traces(marker_line_width=0.5, marker_line_color='white')
+
+        # --- Visibility masks and buttons for Normal vs Stacked ---
+        vis_normal = [True, False, False, False]  # Show Normal view
+        vis_stacked = [False, True, True, True]  # Show Stacked view
+
+        # Start in Normal view
+        for i, v in enumerate(vis_normal):
+            fig.data[i].visible = v
+
+        fig.update_layout(
+            title={'text': f"{title}{subtitle}", 'x': 0.5, 'xanchor': 'center'},
+            template='seaborn',
+            barmode='group',
+            bargap=0.2,
+            height=600,
+            margin=dict(l=140, r=40, t=90, b=130),
+            xaxis_title=_('Count'),
+            yaxis_title=_('Label names'),
+            legend_title=_('Series'),
+            updatemenus=[dict(
+                type='buttons',
+                showactive=True,
+                active=0,
+                direction='right',
+                x=0.5, xanchor='center',
+                y=-0.12, yanchor='top',
+                bgcolor='rgba(245,245,245,0.98)',
+                bordercolor='#d0d0d0',
+                borderwidth=1,
+                pad={'l': 10, 'r': 10, 't': 6, 'b': 6},
+                buttons=[
+                    dict(
+                        label=_('Normal'),
+                        method='update',
+                        args=[{'visible': vis_normal}, {'barmode': 'group', 'legend_title_text': _('Series')}]
+                    ),
+                    dict(
+                        label=_('Stacked'),
+                        method='update',
+                        args=[{'visible': vis_stacked}, {'barmode': 'stack', 'legend_title_text': _('Series')}]
+                    ),
+                ]
+            )],
+        )
+
+        # Soft grid + subtle border
+        fig.update_xaxes(showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False)
+        fig.update_yaxes(showgrid=True, gridcolor='rgba(0,0,0,0.06)')
+        fig.add_shape(
+            type='rect', xref='paper', yref='paper',
+            x0=0, y0=0, x1=1, y1=1,
+            line=dict(color='#e5e7eb', width=1),
+            fillcolor='rgba(0,0,0,0)',
+            layer='below'
+        )
+
+        fig.show()
+        self.helper_export_html(fig)
+
+
+    def barchart_code_volume_by_characters(self):
+
+        title = _('Code text by character count')
+        owner, subtitle = self.owner_and_subtitle_helper()
+        cur = self.app.conn.cursor()
+
+        labels, text_counts, image_counts, av_counts = [], [], [], []
+
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+
+        # --- collect counts per code for Text / Image / A/V ---
+            # Text
             subtitle += case_file_name
         for c in self.codes:
             sql = "select count(cid) from code_text where cid=? and owner like ?"
