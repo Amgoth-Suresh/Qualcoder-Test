@@ -30,7 +30,8 @@ import plotly.graph_objects as go
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
 from .simple_wordcloud import Wordcloud
-
+from plotly.colors import qualitative
+import colorsys
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
 from .helpers import ExportDirectoryPathDialog, Message
@@ -1316,14 +1317,14 @@ class ViewCharts(QDialog):
         top_names      = [c["name"] for c in self.categories if not c.get("supercatid")]  # center nodes
 
         def topcat_name(catid):
-            cur = catid
+            cur_cat = catid
             seen = set()
-            while parentid_by_id.get(cur):
-                if cur in seen:  # safety
+            while parentid_by_id.get(cur_cat):
+                if cur_cat in seen:  # safety
                     break
-                seen.add(cur)
-                cur = parentid_by_id[cur]
-            return name_by_id.get(cur, "")
+                seen.add(cur_cat)
+                cur_cat = parentid_by_id[cur_cat]
+            return name_by_id.get(cur_cat, "")
 
         # --- build children (codes → top category) and center values (sum of their codes) ---
         top_sums = {}
@@ -1368,12 +1369,27 @@ class ViewCharts(QDialog):
 
             if sum_children > 0:
                 # align parent value to children sum
-                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": sum_children})
+                fixed_centers.append({
+                    "id": f"cat::{name}",
+                    "parent_id": "",
+                    "item": name,
+                    "value": sum_children
+                })
             else:
                 # no children -> create a duplicate child, give it a minimal positive value
                 dup_val = max(int(c["value"]), 1)
-                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": dup_val})
-                extra_kids.append({"id": f"dup::{name}", "parent_id": f"cat::{name}", "item": name, "value": dup_val})
+                fixed_centers.append({
+                    "id": f"cat::{name}",
+                    "parent_id": "",
+                    "item": name,
+                    "value": dup_val
+                })
+                extra_kids.append({
+                    "id": f"dup::{name}",
+                    "parent_id": f"cat::{name}",
+                    "item": name,
+                    "value": dup_val
+                })
 
         fixed_kids = []
         for _, r in kids_df.iterrows():
@@ -1386,10 +1402,74 @@ class ViewCharts(QDialog):
 
         d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
 
-        # consistent colors: children share topcat color (use parent_id for grouping)
-        def color_group(row):
-            return row["id"] if row["parent_id"] == "" else row["parent_id"]
-        d2["color_group"] = d2.apply(color_group, axis=1)
+        # --- COLORING: center solid, children gradient per parent based on value ---
+
+        parents_df = d2[d2["parent_id"] == ""].copy()
+        parent_ids = list(parents_df["id"])
+
+        # base palette: use user palette if list, else Plotly qualitative
+        if isinstance(color_palette, list) and color_palette:
+            base_palette = color_palette
+        else:
+            base_palette = qualitative.Plotly
+
+        base_colors = {}
+        for i, pid in enumerate(parent_ids):
+            base_colors[pid] = base_palette[i % len(base_palette)]
+
+        def hex_to_hls(hex_color):
+            """Return (h, l, s) for a hex color."""
+            hex_color = hex_color.lstrip("#")
+            if len(hex_color) == 3:
+                hex_color = "".join([c * 2 for c in hex_color])
+            r = int(hex_color[0:2], 16) / 255.0
+            g = int(hex_color[2:4], 16) / 255.0
+            b = int(hex_color[4:6], 16) / 255.0
+            return colorsys.rgb_to_hls(r, g, b)
+
+        def hls_to_hex(h, l, s):
+            r2, g2, b2 = colorsys.hls_to_rgb(h, l, s)
+            return "#{:02x}{:02x}{:02x}".format(int(r2 * 255), int(g2 * 255), int(b2 * 255))
+
+        # per-parent min/max among children (for stronger gradient)
+        kids_only = d2[d2["parent_id"] != ""]
+        if not kids_only.empty:
+            stats = kids_only.groupby("parent_id")["value"].agg(["min", "max"]).to_dict("index")
+        else:
+            stats = {}
+
+        colors = []
+        for _, row in d2.iterrows():
+            if row["parent_id"] == "":
+                # center: solid base color
+                pid = row["id"]
+                base = base_colors.get(pid, "#888888")
+                colors.append(base)
+            else:
+                pid = row["parent_id"]
+                base = base_colors.get(pid, "#888888")
+
+                # relative position of this child between min and max of this parent
+                st = stats.get(pid, None)
+                if st and st["max"] != st["min"]:
+                    rel = (row["value"] - st["min"]) / (st["max"] - st["min"])
+                else:
+                    rel = 0.5  # all equal, middle shade
+
+                # get base HLS
+                h, base_l, s = hex_to_hls(base)
+
+                # define lightest and darkest bounds around base lightness
+                # low value -> lighter, high value -> darker
+                L_light = min(1.0, base_l + (1.0 - base_l) * 0.5)  # up to 50% toward white
+                L_dark  = max(0.0, base_l * 0.4)                   # down to 40% of base L
+
+                # high rel -> dark, low rel -> light
+                l_child = L_light - (L_light - L_dark) * rel
+
+                colors.append(hls_to_hex(h, l_child, s))
+
+        d2["color"] = colors
 
         # --- plot (exactly two levels; full outer ring) ---
         fig = px.sunburst(
@@ -1398,20 +1478,13 @@ class ViewCharts(QDialog):
             parents="parent_id",
             names="item",
             values="value",
-            color="color_group",  # Apply the color grouping
             branchvalues="total",   # parent size == sum(children)
             maxdepth=2,
             title=title + " " + subtitle
         )
 
-        # Apply the selected color palette (if provided)
-        if color_palette:
-            if isinstance(color_palette, list):  # For discrete color sequences
-                fig.update_traces(marker=dict(colors=color_palette))  # Apply discrete color palette
-            else:
-                fig.update_traces(marker=dict(colorscale=color_palette))  # Apply continuous color scale
-        else:
-            fig.update_traces(marker=dict(colorscale="Viridis"))  # Default color palette if None
+        # apply our precomputed colors
+        fig.update_traces(marker=dict(colors=d2["color"]))
 
         fig.update_traces(
             insidetextorientation="radial",
@@ -1433,8 +1506,10 @@ class ViewCharts(QDialog):
         self.helper_export_html(fig)
 
 
+
     def piechart_code_volume_by_characters(self, color_palette=None):
         """ Code for rendering the pie chart of label text by character count, using the selected color palette. """
+        
         title = 'Label text by character count'
         owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
@@ -1478,7 +1553,7 @@ class ViewCharts(QDialog):
         code_to_cat   = {c["name"]: c.get("catid") for c in self.codes}
         code_to_top   = {nm: topcat_name(code_to_cat.get(nm)) for nm in labels}
 
-        # children rows (codes) using the original totals
+        # children rows (codes) using the original totals (characters)
         kids = []
         top_sums = {}
         for _, r in df_raw.iterrows():
@@ -1530,15 +1605,74 @@ class ViewCharts(QDialog):
                 "id": f"code::{r['item']}::{r['parent']}",
                 "parent_id": f"cat::{r['parent']}",
                 "item": r["item"],
-                "value": int(r["value"])
+                "value": int(r["value"])  # characters
             })
 
         d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
 
-        # consistent colors: children share their parent's color
-        def color_group(row):
-            return row["id"] if row["parent_id"] == "" else row["parent_id"]
-        d2["color_group"] = d2.apply(color_group, axis=1)
+        # ---------- COLORING: parent solid, children gradient by characters ----------
+
+        parents_df = d2[d2["parent_id"] == ""].copy()
+        parent_ids = list(parents_df["id"])
+
+        # base palette: use user palette if list, else Plotly qualitative
+        if isinstance(color_palette, list) and color_palette:
+            base_palette = color_palette
+        else:
+            base_palette = qualitative.Plotly
+
+        base_colors = {}
+        for i, pid in enumerate(parent_ids):
+            base_colors[pid] = base_palette[i % len(base_palette)]
+
+        def hex_to_hls(hex_color):
+            hex_color = hex_color.lstrip("#")
+            if len(hex_color) == 3:
+                hex_color = "".join([c * 2 for c in hex_color])
+            r = int(hex_color[0:2], 16) / 255.0
+            g = int(hex_color[2:4], 16) / 255.0
+            b = int(hex_color[4:6], 16) / 255.0
+            return colorsys.rgb_to_hls(r, g, b)
+
+        def hls_to_hex(h, l, s):
+            r2, g2, b2 = colorsys.hls_to_rgb(h, l, s)
+            return "#{:02x}{:02x}{:02x}".format(int(r2 * 255), int(g2 * 255), int(b2 * 255))
+
+        # per-parent min/max among children (for strong gradient)
+        kids_only = d2[d2["parent_id"] != ""]
+        if not kids_only.empty:
+            stats = kids_only.groupby("parent_id")["value"].agg(["min", "max"]).to_dict("index")
+        else:
+            stats = {}
+
+        colors = []
+        for _, row in d2.iterrows():
+            if row["parent_id"] == "":
+                # center: solid base color
+                pid = row["id"]
+                base = base_colors.get(pid, "#888888")
+                colors.append(base)
+            else:
+                pid = row["parent_id"]
+                base = base_colors.get(pid, "#888888")
+                st = stats.get(pid, None)
+
+                # rel = position of this child between min and max characters for this parent
+                if st and st["max"] != st["min"]:
+                    rel = (row["value"] - st["min"]) / (st["max"] - st["min"])
+                else:
+                    rel = 0.5
+
+                h, base_l, s = hex_to_hls(base)
+
+                # lighter for fewer characters, darker for more
+                L_light = min(1.0, base_l + (1.0 - base_l) * 0.5)
+                L_dark  = max(0.0, base_l * 0.4)
+                l_child = L_light - (L_light - L_dark) * rel
+
+                colors.append(hls_to_hex(h, l_child, s))
+
+        d2["color"] = colors
 
         # --- plot two-level sunburst ---
         fig = px.sunburst(
@@ -1546,21 +1680,14 @@ class ViewCharts(QDialog):
             ids="id",
             parents="parent_id",
             names="item",
-            values="value",
-            color="color_group",
+            values="value",     # character-based size
             branchvalues="total",
             maxdepth=2,
             title=title + " " + subtitle
         )
 
-        # Apply the selected color palette (if provided)
-        if color_palette:
-            if isinstance(color_palette, list):  # For discrete color sequences
-                fig.update_traces(marker=dict(colors=color_palette))  # Apply discrete color palette
-            else:
-                fig.update_traces(marker=dict(colorscale=color_palette))  # Apply continuous color scale
-        else:
-            fig.update_traces(marker=dict(colorscale="Viridis"))  # Default color palette if None
+        # apply our precomputed colors
+        fig.update_traces(marker=dict(colors=d2["color"]))
 
         fig.update_traces(
             insidetextorientation="radial",
@@ -1580,6 +1707,7 @@ class ViewCharts(QDialog):
 
         fig.show()
         self.helper_export_html(fig)
+
 
 
     def piechart_code_volume_by_area(self):
