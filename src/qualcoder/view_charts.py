@@ -2437,14 +2437,58 @@ class ViewCharts(QDialog):
                             case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
                         code_counts.append(case_counts)
                     data.append(code_counts)
+
         # Create the plot
+        # 1. Prepare text matrices: one showing all numbers, one hiding zeros
+        text_with_zeros = [[str(val) for val in row] for row in data]
+        text_no_zeros = [[str(val) if val != 0 else "" for val in row] for row in data]
+
         fig = px.imshow(data,
-                        labels=dict(x=heatmap_type, y="Codes", color="Count"),
+                        labels=dict(x=heatmap_type, y="Labels", color="Count"),
                         x=x_labels,
                         y=y_labels,
                         title=title + subtitle,
-                        text_auto=True #this adds numbers on the boxes
+                        text_auto=False  # Turn off auto text so we can control it
                         )
+
+        # 2. Configure Traces: Start with Zeros VISIBLE (text_with_zeros)
+        #    Add xgap/ygap to create the separating lines between boxes
+        fig.update_traces(
+            text=text_with_zeros, 
+            texttemplate="%{text}",
+            xgap=1, 
+            ygap=1
+        )
+
+        # 3. Configure Layout with a fixed Margin and Toggle Button
+        fig.update_layout(
+            # Large Top Margin (150px) ensures the title and button don't move when data changes
+            margin=dict(t=150, l=10, r=10, b=10),
+            updatemenus=[
+                dict(
+                    type="buttons",
+                    direction="left",
+                    buttons=list([
+                        dict(
+                            # This 'args2' setup allows the button to act as a Toggle
+                            # Click 1 triggers 'args' (Hide Zeros)
+                            # Click 2 triggers 'args2' (Show Zeros)
+                            args=[{"text": [text_no_zeros]}],
+                            args2=[{"text": [text_with_zeros]}],
+                            label="Toggle Zeros",
+                            method="restyle"
+                        )
+                    ]),
+                    pad={"r": 10, "t": 10},
+                    showactive=True,
+                    x=0.0,
+                    xanchor="left",
+                    y=1.15, # Fixed position inside the top margin
+                    yanchor="top"
+                ),
+            ]
+        )
+
         fig.update_xaxes(side="top")
         fig.show()
         self.helper_export_html(fig)
