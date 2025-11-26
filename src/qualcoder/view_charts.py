@@ -567,7 +567,7 @@ class ViewCharts(QDialog):
             image_counts.append((res_image[0] or 0))
             av_counts.append((res_av[0] or 0))
 
-        # --- dataframe + cutoff filter based on TOTAL (like your original) ---
+        # --- dataframe + cutoff filter based on TOTAL ---
         df = pd.DataFrame({
             'Label names': labels,
             'Text': text_counts,
@@ -593,7 +593,7 @@ class ViewCharts(QDialog):
             color_palette = self.get_color_palette()
 
         # --- build traces: 1 Total (for Normal), plus 3 components (for Stacked) ---
-        # For stacked, use the same color order for each series
+        # IMPORTANT: do NOT pass a full list of colors to each trace.
         total_trace = go.Bar(
             y=df['Label names'],
             x=df['Total'],
@@ -601,7 +601,6 @@ class ViewCharts(QDialog):
             orientation='h',
             text=df['Total'],
             textposition='auto',
-            marker=dict(color=color_palette)  # Apply selected color palette here
         )
         text_trace = go.Bar(
             y=df['Label names'],
@@ -610,7 +609,6 @@ class ViewCharts(QDialog):
             orientation='h',
             text=df['Text'],
             textposition='auto',
-            marker=dict(color=color_palette)
         )
         image_trace = go.Bar(
             y=df['Label names'],
@@ -619,7 +617,6 @@ class ViewCharts(QDialog):
             orientation='h',
             text=df['Image'],
             textposition='auto',
-            marker=dict(color=color_palette)
         )
         av_trace = go.Bar(
             y=df['Label names'],
@@ -628,16 +625,22 @@ class ViewCharts(QDialog):
             orientation='h',
             text=df['A/V'],
             textposition='auto',
-            marker=dict(color=color_palette)
         )
 
         fig = go.Figure(data=[total_trace, text_trace, image_trace, av_trace])
 
+        # Apply palette *per trace* using colorway if provided (for Colorblind / Corporate etc.)
+        # For "Default", you can have get_color_palette() return None, so the template colors are used.
+        if color_palette:
+            # Expecting color_palette to be a list/tuple of colors, e.g. ['#1f77b4', '#ff7f0e', ...]
+            fig.update_layout(colorway=color_palette)
+
+        # Keep the white borders as you had
         fig.update_traces(marker_line_width=0.5, marker_line_color='white')
 
         # --- Visibility masks and buttons for Normal vs Stacked ---
         vis_normal = [True, False, False, False]  # Show Normal view
-        vis_stacked = [False, True, True, True]  # Show Stacked view
+        vis_stacked = [False, True, True, True]   # Show Stacked view
 
         # Start in Normal view
         for i, v in enumerate(vis_normal):
@@ -668,12 +671,18 @@ class ViewCharts(QDialog):
                     dict(
                         label=_('Normal'),
                         method='update',
-                        args=[{'visible': vis_normal}, {'barmode': 'group', 'legend_title_text': _('Series')}]
+                        args=[
+                            {'visible': vis_normal},
+                            {'barmode': 'group', 'legend_title_text': _('Series')}
+                        ]
                     ),
                     dict(
                         label=_('Stacked'),
                         method='update',
-                        args=[{'visible': vis_stacked}, {'barmode': 'stack', 'legend_title_text': _('Series')}]
+                        args=[
+                            {'visible': vis_stacked},
+                            {'barmode': 'stack', 'legend_title_text': _('Series')}
+                        ]
                     ),
                 ]
             )],
@@ -692,6 +701,7 @@ class ViewCharts(QDialog):
 
         fig.show()
         self.helper_export_html(fig)
+
 
     def barchart_code_volume_by_characters_new(self, color_palette=None):
         TOP_N_FILES = 5     # top files to show as separate stacks
