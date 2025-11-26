@@ -1288,11 +1288,6 @@ class ViewCharts(QDialog):
 
     def hierarchy_code_frequency(self, color_palette=None):
         """ Code for rendering the hierarchy chart, using the selected color palette. """
-        import pandas as pd
-        import colorsys
-        from plotly.colors import qualitative
-        import plotly.graph_objects as go
-
         title = "Chart of Label and Category Counts"
         owner, subtitle = self.owner_and_subtitle_helper()
         case_file_name, file_ids = self.get_file_ids()
@@ -1533,14 +1528,8 @@ class ViewCharts(QDialog):
         fig.show()
         self.helper_export_html(fig)
 
-
-
-
-
-
     def piechart_code_volume_by_characters(self, color_palette=None):
         """ Code for rendering the pie chart of label text by character count, using the selected color palette. """
-        
         title = 'Label text by character count'
         owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
@@ -1581,8 +1570,8 @@ class ViewCharts(QDialog):
             return name_by_id.get(curid, "")
 
         # map code -> cat/topcat using self.codes (no DB changes)
-        code_to_cat   = {c["name"]: c.get("catid") for c in self.codes}
-        code_to_top   = {nm: topcat_name(code_to_cat.get(nm)) for nm in labels}
+        code_to_cat = {c["name"]: c.get("catid") for c in self.codes}
+        code_to_top = {nm: topcat_name(code_to_cat.get(nm)) for nm in labels}
 
         # children rows (codes) using the original totals (characters)
         kids = []
@@ -1624,11 +1613,26 @@ class ViewCharts(QDialog):
             name = c["item"]
             sum_children = int(child_sums.get(name, 0))
             if sum_children > 0:
-                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": sum_children})
+                fixed_centers.append({
+                    "id": f"cat::{name}",
+                    "parent_id": "",
+                    "item": name,
+                    "value": sum_children
+                })
             else:
                 dup_val = max(int(c["value"]), 1)  # keep visible center and a tiny child if it had no kids
-                fixed_centers.append({"id": f"cat::{name}", "parent_id": "", "item": name, "value": dup_val})
-                extra_kids.append({"id": f"dup::{name}", "parent_id": f"cat::{name}", "item": name, "value": dup_val})
+                fixed_centers.append({
+                    "id": f"cat::{name}",
+                    "parent_id": "",
+                    "item": name,
+                    "value": dup_val
+                })
+                extra_kids.append({
+                    "id": f"dup::{name}",
+                    "parent_id": f"cat::{name}",
+                    "item": name,
+                    "value": dup_val
+                })
 
         fixed_kids = []
         for _, r in kids_df.iterrows():
@@ -1641,7 +1645,7 @@ class ViewCharts(QDialog):
 
         d2 = pd.DataFrame(fixed_centers + fixed_kids + extra_kids)
 
-        # ---------- COLORING: parent solid, children gradient by characters ----------
+        # ---------- COLORING: parent solid, children gradient by characters (same logic as hierarchy_code_frequency) ----------
 
         parents_df = d2[d2["parent_id"] == ""].copy()
         parent_ids = list(parents_df["id"])
@@ -1669,12 +1673,16 @@ class ViewCharts(QDialog):
             r2, g2, b2 = colorsys.hls_to_rgb(h, l, s)
             return "#{:02x}{:02x}{:02x}".format(int(r2 * 255), int(g2 * 255), int(b2 * 255))
 
-        # per-parent min/max among children (for strong gradient)
+        # per-parent min/max among children (for gradient)
         kids_only = d2[d2["parent_id"] != ""]
         if not kids_only.empty:
             stats = kids_only.groupby("parent_id")["value"].agg(["min", "max"]).to_dict("index")
         else:
             stats = {}
+
+        # parent totals & child counts (for the equality rule)
+        parent_totals = parents_df.set_index("id")["value"].to_dict()
+        child_counts_by_parent = d2[d2["parent_id"] != ""].groupby("parent_id")["id"].count().to_dict()
 
         colors = []
         for _, row in d2.iterrows():
@@ -1686,50 +1694,74 @@ class ViewCharts(QDialog):
             else:
                 pid = row["parent_id"]
                 base = base_colors.get(pid, "#888888")
+
+                child_val    = row["value"]
+                parent_total = parent_totals.get(pid, 0) or 1
+                n_children   = child_counts_by_parent.get(pid, 0)
+
+                # STRICT RULE:
+                # if there is only ONE child and its value == parent's value
+                # -> use EXACT parent color (no gradient)
+                if n_children == 1 and child_val == parent_total:
+                    colors.append(base)
+                    continue
+
+                # gradient based on min/max among children
                 st = stats.get(pid, None)
-
-                # rel = position of this child between min and max characters for this parent
                 if st and st["max"] != st["min"]:
-                    rel = (row["value"] - st["min"]) / (st["max"] - st["min"])
+                    rel = (child_val - st["min"]) / (st["max"] - st["min"])
                 else:
-                    rel = 0.5
+                    rel = 0.5  # all equal, middle shade
 
+                # get base HLS (parent color)
                 h, base_l, s = hex_to_hls(base)
 
-                # lighter for fewer characters, darker for more
-                L_light = min(1.0, base_l + (1.0 - base_l) * 0.5)
-                L_dark  = max(0.0, base_l * 0.4)
+                # --- corrected gradient logic (same as hierarchy_code_frequency) ---
+                # parent (base_l) is darkest; children must be strictly lighter
+                # L_light: lighter bound (toward white)
+                L_light = min(1.0, base_l + (1.0 - base_l) * 0.3)
+
+                # how much room we have to lighten
+                span = max(1e-6, L_light - base_l)
+
+                # L_dark: slightly lighter than parent (so no child = exactly parent color)
+                # darkest child is 20% along the way from parent to L_light
+                L_dark = base_l + span * 0.2
+
+                # clamp rel to [0, 1]
+                rel = max(0.0, min(1.0, rel))
+
+                # rel = 1.0 -> L_dark (closest to parent, but still lighter)
+                # rel = 0.0 -> L_light (lightest)
                 l_child = L_light - (L_light - L_dark) * rel
 
                 colors.append(hls_to_hex(h, l_child, s))
 
         d2["color"] = colors
 
-        # --- plot two-level sunburst ---
-        fig = px.sunburst(
-            d2,
-            ids="id",
-            parents="parent_id",
-            names="item",
-            values="value",     # character-based size
-            branchvalues="total",
-            maxdepth=2,
-            title=title + " " + subtitle
-        )
-
-        # apply our precomputed colors
-        fig.update_traces(marker=dict(colors=d2["color"]))
-
-        fig.update_traces(
-            insidetextorientation="radial",
-            hovertemplate="<b>%{label}</b><br>"
-                        "Parent: %{parent}<br>"
-                        "Characters: %{value}<br>"
-                        "% of parent: %{percentParent:.1%}<br>"
-                        "% of total: %{percentRoot:.1%}<extra></extra>"
+        # --- plot two-level sunburst with go.Sunburst ---
+        fig = go.Figure(
+            go.Sunburst(
+                ids=d2["id"],
+                labels=d2["item"],
+                parents=d2["parent_id"],
+                values=d2["value"],       # character-based size
+                branchvalues="total",
+                maxdepth=2,
+                marker=dict(
+                    colors=d2["color"]
+                ),
+                leaf=dict(opacity=1),     # important: no dimming of leaves
+                hovertemplate="<b>%{label}</b><br>"
+                            "Parent: %{parent}<br>"
+                            "Characters: %{value}<br>"
+                            "% of parent: %{percentParent:.1%}<br>"
+                            "% of total: %{percentRoot:.1%}<extra></extra>"
+            )
         )
 
         fig.update_layout(
+            title=title + " " + subtitle,
             uniformtext_minsize=10,
             uniformtext_mode="hide",
             margin=dict(l=0, r=0, t=60, b=0),
@@ -1738,8 +1770,6 @@ class ViewCharts(QDialog):
 
         fig.show()
         self.helper_export_html(fig)
-
-
 
     def piechart_code_volume_by_area(self):
         """ Codes by image area volume. """
