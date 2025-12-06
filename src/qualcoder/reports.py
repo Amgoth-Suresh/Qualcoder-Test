@@ -943,12 +943,38 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         ui.exec()
 
 
-info = "<b>Agree %</b>" \
-       "<p>Calculated across all text files as the (total dual coded plus the total uncoded) / total characters</p>" \
-       "<b>A and B %</b><p>Calculated as the total dual coded characters / total characters</p>" \
-       "<b>Not A Not B %</b><p>The characters not coded by either coder / total characters</p>" \
-       "<b>Disagree %</b><p>Is 100% minus the total agreement percent.</p>" \
-       "<b>Agree coded only %</b><p>Is the dual coded characters divided by the dual coded and single coded characters" \
-       "</p>" \
-       "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
-       "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
+info = (
+    "<b>Agree %</b>"
+    "<p>This is the percentage of all characters where the two coders made the "
+    "same decision for this code. It includes both characters that were coded "
+    "by <i>both</i> coders and characters that were left uncoded by <i>both</i> coders. "
+    "Formally: (dual coded characters + uncoded characters) ÷ all characters.</p>"
+
+    "<b>A and B %</b>"
+    "<p>This is the percentage of all characters that were coded with this code "
+    "by <i>both</i> coders. These are the overlapping (shared) codings. "
+    "Formally: dual coded characters ÷ all characters.</p>"
+
+    "<b>Not A Not B %</b>"
+    "<p>This is the percentage of all characters that were <i>not</i> coded with "
+    "this code by either coder. In other words, both coders decided not to apply "
+    "this code to these characters. Formally: uncoded characters ÷ all characters.</p>"
+
+    "<b>Disagree %</b>"
+    "<p>This is the percentage of characters where only one coder applied the code "
+    "and the other did not. These are the single-coded characters and represent "
+    "disagreement. It is calculated as 100% − Agree %.</p>"
+
+    "<b>Agree coded only %</b>"
+    "<p>This shows agreement <i>only within the characters that were coded at least once</i> "
+    "by either coder. It ignores the completely uncoded text. It is calculated as: "
+    "dual coded characters ÷ (dual coded + single coded characters).</p>"
+
+    "<b>Kappa</b>"
+    "<p>Cohen’s Kappa is a measure of inter-rater reliability. It adjusts the observed "
+    "agreement between coders by the amount of agreement that would be expected by chance. "
+    "A value close to 1 indicates strong agreement; values near 0 indicate that agreement is "
+    "no better than random. Calculations follow the definition at "
+    "https://en.wikipedia.org/wiki/Cohen%27s_kappa.</p>"
+)
+
