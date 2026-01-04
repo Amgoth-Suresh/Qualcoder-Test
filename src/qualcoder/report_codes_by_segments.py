@@ -88,6 +88,10 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.pushButton_export_xlsx.setIcon(qta.icon('mdi6.microsoft-excel', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export_xlsx.clicked.connect(self.export_xlsx_file)
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
+
+
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.get_files_and_cases()
@@ -155,6 +159,17 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
+    
+    def show_information(self):
+        """Show info dialog for Codes by Segments."""
+        text = (
+            "Codes by Text Segments Report\n\n"
+            "This report shows rows of coded text segments and columns indicating which codes "
+            "have been applied. For some users, for example in the legal domain, it is convenient "
+            "to see which codes have been applied to the same text segment.\n\n"
+            "An Excel file can be exported."
+        )   
+        QtWidgets.QMessageBox.information(self, ("Information"), text)
 
     def get_selected_files_and_cases(self):
         """ Fill file_ids and case_ids Strings used in the search.

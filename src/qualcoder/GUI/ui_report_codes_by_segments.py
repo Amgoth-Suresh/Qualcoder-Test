@@ -52,6 +52,11 @@ class Ui_DialogSegmentCodings(object):
         self.pushButton_export_xlsx.setObjectName("pushButton_export_xlsx")
         self.pushButton_file_attributes = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_file_attributes.setGeometry(QtCore.QRect(390, 44, 32, 32))
+        self.pushButton_info = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_info.setGeometry(QtCore.QRect(550, 44, 32, 32))  # adjust X as needed
+        self.pushButton_info.setText("")
+        self.pushButton_info.setObjectName("pushButton_info")
+
         self.pushButton_file_attributes.setText("")
         self.pushButton_file_attributes.setObjectName("pushButton_file_attributes")
         self.verticalLayout.addWidget(self.groupBox)
