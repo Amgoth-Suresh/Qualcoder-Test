@@ -123,7 +123,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
     def show_information(self):
         """Show info dialog for Codes by Segments."""
         text = (
-            "This report details all the exact matching coded text segments, where different codes are applied to the exact same text. Select text documents, and two or more codes."
+            "This report details all the exact matching coded text segments, where different Labels are applied to the exact same text. Select text documents, and two or more Labels."
         )   
         QtWidgets.QMessageBox.information(self, ("Information"), text)
 

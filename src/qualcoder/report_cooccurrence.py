@@ -135,8 +135,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         """Show info dialog for Codes by Segments."""
         text = (
             "• The report displays a table with code names on both the X and Y axes.\n"
-            "• Each table cell shows the count of coding co-occurrences.\n"
-            "• A co-occurrence occurs when two codes overlap or directly abut.\n"
+            "• Each table cell shows the count of Labeling co-occurrences.\n"
+            "• A co-occurrence occurs when two Labels overlap or directly abut.\n"
             "• Clicking on a cell displays the corresponding text coding details.\n"
             "• Filtering options include:\n"
             "  - Specific text files\n"
