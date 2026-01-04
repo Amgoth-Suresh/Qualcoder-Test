@@ -161,12 +161,12 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             self.coders.append(row[0])
     
     def show_information(self):
-        """Show info dialog for Codes by Segments."""
+        """Show info dialog for Labels by Segments."""
         text = (
-            "Codes by Text Segments Report\n\n"
-            "This report shows rows of coded text segments and columns indicating which codes "
+            "Labels by Text Segments Report\n\n"
+            "This report shows rows of coded text segments and columns indicating which Labels "
             "have been applied. For some users, for example in the legal domain, it is convenient "
-            "to see which codes have been applied to the same text segment.\n\n"
+            "to see which Labels have been applied to the same text segment.\n\n"
             "An Excel file can be exported."
         )   
         QtWidgets.QMessageBox.information(self, ("Information"), text)
