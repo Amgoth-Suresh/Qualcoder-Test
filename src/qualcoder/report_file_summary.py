@@ -79,6 +79,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
         self.ui.listWidget.setStyleSheet(treefont)
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.get_files()
@@ -91,6 +93,23 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogreport_file_summary_splitter0'] = sizes[0]
         self.app.settings['dialogreport_file_summary_splitter1'] = sizes[1]
+
+    def show_information(self):
+        text = (
+            "• Click on a file to view a summary of that file.\n"
+            "• The summary includes media metadata, character counts, and word frequency.\n"
+            "• File attributes are displayed.\n"
+            "• The report summarizes the count of labels used in that file.\n"
+            "• For text labelings, the report summarizes the average text length.\n"
+            "• For image labelings, the report summarizes the average pixel area.\n"
+            "• For audio/video labelings, the report summarizes the average segment length.\n\n"
+            "• The top 100 words list has stopwords applied, so common filler words such as 'a' and 'the' are excluded.\n"
+            "• The default stopwords list can be found in the Examples folder.\n"
+            "• You can override this list by providing your own stopwords text file.\n"
+            "• Place the custom stopwords file in the .qualcoder folder."
+        )
+  
+        QtWidgets.QMessageBox.information(self, ("Information"), text)
 
     def get_files(self):
         """ Get source files with additional details and fill list widget.
