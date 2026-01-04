@@ -542,7 +542,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_excel)  # export_text_file)
         self.ui.pushButton_export.setToolTip(_("Export Excel"))
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.microsoft-excel', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
+        self.ui.pushButton_help1.setIcon(qta.icon('mdi6.information-variant-circle'))
         self.ui.pushButton_help1.pressed.connect(self.information)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
