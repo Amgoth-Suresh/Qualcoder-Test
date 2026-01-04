@@ -40,6 +40,10 @@ class Ui_Dialog_code_summary(object):
         self.pushButton_search_next.setGeometry(QtCore.QRect(709, 0, 28, 28))
         self.pushButton_search_next.setText("")
         self.pushButton_search_next.setObjectName("pushButton_search_next")
+        self.pushButton_info = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_info.setGeometry(QtCore.QRect(750, 0, 28, 28))  # adjust X as needed
+        self.pushButton_info.setText("")
+        self.pushButton_info.setObjectName("pushButton_info") 
         self.lineEdit_search_results = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_search_results.setGeometry(QtCore.QRect(521, 0, 181, 28))
         self.lineEdit_search_results.setObjectName("lineEdit_search_results")
