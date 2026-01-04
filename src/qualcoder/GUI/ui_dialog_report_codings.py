@@ -116,6 +116,11 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_export_matrix = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_export_matrix.setGeometry(QtCore.QRect(892, 23, 151, 32))
         self.pushButton_export_matrix.setObjectName("pushButton_export_matrix")
+
+        self.pushButton_info = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_info.setGeometry(QtCore.QRect(1050, 23, 32, 32))  # adjust X as needed
+        self.pushButton_info.setText("")
+        self.pushButton_info.setObjectName("pushButton_info")  
         self.checkBox_show_refs = QtWidgets.QCheckBox(parent=self.groupBox)
         self.checkBox_show_refs.setGeometry(QtCore.QRect(390, 90, 131, 26))
         self.checkBox_show_refs.setObjectName("checkBox_show_refs")

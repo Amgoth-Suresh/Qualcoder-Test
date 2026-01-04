@@ -127,6 +127,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
         self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.cursor-default'))
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.magnify'))
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
                    _("Categories by file"), _("Codes by case"), _("Codes by file")]
@@ -189,6 +191,84 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.app.settings['dialogreportcodes_splitter_v0'] = max(sizes_vert[0], 10)
         self.app.settings['dialogreportcodes_splitter_v1'] = max(sizes_vert[1], 10)
         self.app.settings['dialogreportcodes_splitter_v2'] = max(sizes_vert[2], 10)
+
+    def show_information(self):
+        text = (
+            "• This report provides a list or matrix of labeled data based on your selections.\n"
+            "• One or more labels must be selected.\n"
+            "• If a category is selected, all labels within that category are automatically selected.\n"
+            "• Multiple categories can be selected using the mouse and the Ctrl key.\n\n"
+            "• Click the Search (▶) button to display the results.\n\n"
+            "• Narrowing down results:\n"
+            "  - Results can be filtered using File selection, Case selection, or Attribute selection.\n"
+            "  - Only labelings within the selected files or cases are shown.\n"
+            "  - When case selection is used, file selection is ignored, and vice versa.\n\n"
+            "• Text search:\n"
+            "  - Enter text in the Search field to display only labelings containing matching text.\n"
+            "  - The search also checks memos for labeled image areas and labeled audio/video segments.\n"
+            "  - Text search must be used together with File, Case, or Attribute selection.\n\n"
+            "• Important labelings:\n"
+            "  - A checkbox allows showing only labelings marked as Important.\n"
+            "  - This helps quickly find key examples for reports.\n\n"
+            "• Attribute selection in reports:\n"
+            "  - Opens a window to select attributes for files and cases (e.g., interview files for people aged > 60).\n"
+            "  - Attribute settings can be saved, loaded, and deleted.\n\n"
+            "• Coding matrix view:\n"
+            "  - When a matrix option is selected, the results pane is split into two panes.\n"
+            "  - The left pane shows labeled data as a list.\n"
+            "  - The right pane shows a matrix of rows and columns.\n"
+            "  - Column types can be labels, categories, or top-level categories.\n"
+            "  - Matrix options allow labels/categories by file or by case.\n"
+            "  - The matrix can be transposed using a checkbox.\n"
+            "  - Pane sizes can be adjusted by dragging the divider bar.\n\n"
+            "• Case matrix view:\n"
+            "  - When cases are selected, an additional pane shows cases as rows and labels or categories as columns.\n\n"
+            "• Check box options:\n"
+            "  - Show only Important labeled segments.\n"
+            "  - Add summary statistics to the report.\n"
+            "  - Show text context for labeled text segments (100–300 surrounding characters, set in Settings).\n"
+            "    The labeled text is shown in bold.\n"
+            "  - Add references to labeled results, if references are linked to the file.\n\n"
+            "• Other functions:\n"
+            "  - Shortcut H: Press 'H' to hide or show the top controls section.\n\n"
+            "• Memos:\n"
+            "  - A dropdown menu allows selecting memo display options.\n"
+            "  - Options include no memos, various memo types, or text file annotations for selected files.\n"
+            "  - Right-click on a label heading in the report for additional options such as:\n"
+            "    View in context, unmark, or change the label.\n\n"
+            "• Exporting reports:\n"
+            "  - Reports can be exported as HTML, ODT, TXT, CSV, XLSX, or (v3.8+) IRAMUTEQ formats.\n\n"
+            "• Export format details:\n"
+            "  - TXT: Plain text file.\n"
+            "  - CSV: Plain text spreadsheet format.\n"
+            "  - XLSX: Microsoft Excel spreadsheet containing text.\n"
+            "  - ODT: Open Document Text, compatible with Microsoft Word and LibreOffice Writer.\n"
+            "    Supports text, colors, and images.\n"
+            "  - IRAMUTEQ: Text export for use in IRAMUTEQ software.\n"
+            "  - HTML: Web browser format.\n"
+            "    If media is included, an associated folder is created containing image, audio, and video files.\n"
+            "    To share or move the report, both the HTML file and its associated folder must be moved together."
+        )
+
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle(_("Information"))
+        dialog.resize(650, 500)
+        dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+
+        layout = QtWidgets.QVBoxLayout(dialog)
+
+        text_edit = QtWidgets.QTextEdit(dialog)
+        text_edit.setReadOnly(True)
+        text_edit.setLineWrapMode(QtWidgets.QTextEdit.LineWrapMode.WidgetWidth)
+        text_edit.setPlainText(text)
+        layout.addWidget(text_edit)
+
+        btns = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Close)
+        btns.rejected.connect(dialog.reject)
+        btns.accepted.connect(dialog.accept)  # (Close usually triggers rejected, but safe)
+        layout.addWidget(btns)
+
+        dialog.exec()
 
     def get_files_and_cases(self):
         """ Get source files with additional details and fill files list widget.
