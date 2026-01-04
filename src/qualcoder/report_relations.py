@@ -87,6 +87,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
         self.ui.pushButton_export_exact.setIcon(qta.icon('mdi6.microsoft-excel',options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export_exact.pressed.connect(self.export_exact_excel_file)
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
         self.ui.pushButton_calculate.setIcon(qta.icon('mdi6.calculator', options=[{'scale_factor': 1.5}]))
         self.ui.pushButton_calculate.pressed.connect(self.calculate_code_relations)
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.4}]))
@@ -154,6 +156,25 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
         self.attributes = []
+
+    def show_information(self):
+        text = (
+        "• This dialog shows the relationships between two or more labels.\n"
+        "• This feature can only be applied to text files.\n"
+        "• Select two or more labels and press the Calculate button.\n"
+        "• This report is useful for identifying proximity or overlaps between labels.\n"
+        "• Note: Other reports such as Label Co-occurrence and Label Text Exact Matches also provide similar functionality.\n"
+        "• This report provides detailed information, including the coding character positions for each label.\n"
+        "• Summary statistics and box plots can be produced.\n"
+        "• A CSV file can be exported.\n\n"
+        "• The types of relationships include:\n"
+        "  - Proximity: Two labels do not overlap. The distance between them is shown in number of characters.\n"
+        "  - Overlap: Two labels partially overlap. The lowest and highest character positions of the combination are shown, along with the union of the overlapping section.\n"
+        "  - Inclusion: One label is fully included within another. The lowest and highest character positions of the combination are shown, along with the union of the overlapping section.\n"
+        "  - Exact: Both labels have the same start and end positions. The lowest and highest character positions of the combination are shown, along with the union of the overlapping section."
+    )
+ 
+        QtWidgets.QMessageBox.information(self, ("Information"), text)
 
     def get_files_from_attributes(self):
         """ Select text files based on attribute selections.
