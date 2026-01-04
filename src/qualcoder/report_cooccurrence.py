@@ -19,6 +19,7 @@ https://github.com/ccbogel/QualCoder
 """
 
 from copy import deepcopy
+from email.mime import text
 import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
@@ -68,6 +69,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.format-list-group', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
@@ -127,6 +130,25 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.attributes = []
 
         self.process_data()
+    
+    def show_information(self):
+        """Show info dialog for Codes by Segments."""
+        text = (
+            "• The report displays a table with code names on both the X and Y axes.\n"
+            "• Each table cell shows the count of coding co-occurrences.\n"
+            "• A co-occurrence occurs when two codes overlap or directly abut.\n"
+            "• Clicking on a cell displays the corresponding text coding details.\n"
+            "• Filtering options include:\n"
+            "  - Specific text files\n"
+            "  - Files selected by attributes\n"
+            "  - Specific codes\n"
+            "  - Code categories\n"
+            "• An Export to Excel option is available.\n"
+            "• Clicking on a cell also provides detailed text information."
+        )
+
+
+        QtWidgets.QMessageBox.information(self, ("Information"), text)
 
     def get_files_from_attributes(self):
         """ Select text files based on attribute selections.

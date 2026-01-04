@@ -36,6 +36,10 @@ class Ui_Dialog_Coocurrence(object):
         self.pushButton_export.setObjectName("pushButton_export")
         self.checkBox_hide_blanks = QtWidgets.QCheckBox(parent=self.groupBox)
         self.checkBox_hide_blanks.setGeometry(QtCore.QRect(10, 30, 211, 20))
+        self.pushButton_info = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_info.setGeometry(QtCore.QRect(450, 0,32, 32))  # adjust X as needed
+        self.pushButton_info.setText("")
+        self.pushButton_info.setObjectName("pushButton_info")   
         self.checkBox_hide_blanks.setObjectName("checkBox_hide_blanks")
         self.pushButton_select_files = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_select_files.setGeometry(QtCore.QRect(250, 1, 32, 32))
