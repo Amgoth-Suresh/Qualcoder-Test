@@ -34,6 +34,10 @@ class Ui_Dialog_Comparisons(object):
         self.pushButton_export.setMaximumSize(QtCore.QSize(32, 32))
         self.pushButton_export.setText("")
         self.pushButton_export.setObjectName("pushButton_export")
+        self.pushButton_info = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_info.setGeometry(QtCore.QRect(580, 1, 32, 32))  # adjust X as needed
+        self.pushButton_info.setText("")
+        self.pushButton_info.setObjectName("pushButton_info")   
         self.checkBox_hide_blanks = QtWidgets.QCheckBox(parent=self.groupBox)
         self.checkBox_hide_blanks.setGeometry(QtCore.QRect(10, 30, 151, 20))
         self.checkBox_hide_blanks.setObjectName("checkBox_hide_blanks")

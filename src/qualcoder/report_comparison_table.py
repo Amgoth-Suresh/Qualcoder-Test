@@ -62,6 +62,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.label_arrow.setPixmap(qta.icon('mdi6.arrow-right').pixmap(24, 24))
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.format-list-group', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
@@ -110,6 +112,31 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.tableWidget.setRowCount(0)
         self.ui.tableWidget.setColumnCount(0)
         self.ui.listWidget.clear()
+
+    def show_information(self):
+        text = (
+            "• How to use the “Label counts by file / case” report:\n\n"
+            "• Select labels:\n"
+            "  - First, select one or more labels from the label tree.\n"
+            "  - These labels define what will be counted in the report.\n\n"
+            "• Select one category:\n"
+            "  - After selecting labels, select one category.\n"
+            "  - Only one category can be selected.\n\n"
+            "• Select files:\n"
+            "  - Select one or more files to include in the report.\n"
+            "• (Optional) Select cases:\n"
+            "  - Select one or more cases to summarize the report by case instead of by file.\n"
+            "  - When cases are selected, label counts are grouped by case.\n\n"
+            "• (Optional) Filter files using attributes:\n"
+            "  - Click File Attributes to restrict files based on metadata.\n"
+            "  - Attribute-based selection overrides manual file selection.\n\n"
+            "• View and export results:\n"
+            "  - The table shows how many times each selected label appears in each file or case.\n"
+            "  - Use Export to Excel to save the results."
+        )
+
+        
+        QtWidgets.QMessageBox.information(self, ("Information"), text)
 
     def select_attribute(self):
         """ Select an attribute.
