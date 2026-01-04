@@ -47,9 +47,14 @@ class Ui_DialogMatchingTextSegments(object):
         self.pushButton_export.setGeometry(QtCore.QRect(740, 20, 32, 32))
         self.pushButton_export.setText("")
         self.pushButton_export.setObjectName("pushButton_export")
+
         self.pushButton_run = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_run.setGeometry(QtCore.QRect(700, 20, 32, 32))
         self.pushButton_run.setText("")
+        self.pushButton_info = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_info.setGeometry(QtCore.QRect(780, 20, 32, 32))  # adjust X as needed
+        self.pushButton_info.setText("")
+        self.pushButton_info.setObjectName("pushButton_info")
         self.pushButton_run.setObjectName("pushButton_run")
         self.label_include = QtWidgets.QLabel(parent=self.groupBox)
         self.label_include.setGeometry(QtCore.QRect(340, 0, 111, 26))

@@ -70,6 +70,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.microsoft-excel', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
         self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.cursor-default', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_info.setIcon(qta.icon('mdi6.information-variant-circle', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_info.clicked.connect(self.show_information)
         self.excluded_icon = qta.icon('mdi6.window-close')
         self.get_data()
 
@@ -117,6 +119,13 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
         self.ui.comboBox_coders.insertItems(0, self.coders)
+    
+    def show_information(self):
+        """Show info dialog for Codes by Segments."""
+        text = (
+            "This report details all the exact matching coded text segments, where different codes are applied to the exact same text. Select text documents, and two or more codes."
+        )   
+        QtWidgets.QMessageBox.information(self, ("Information"), text)
 
     def get_files_fill_list_widget(self):
         """ Get source files with additional details and fill list widget.
