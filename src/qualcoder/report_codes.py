@@ -126,7 +126,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
         self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.cursor-default'))
-        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
+        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.magnify'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
                    _("Categories by file"), _("Codes by case"), _("Codes by file")]
