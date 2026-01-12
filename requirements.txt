@@ -1,31 +1,33 @@
-chardet
-diff-match-patch
-EbookLib
-openpyxl
-pandas
-pdfminer.six
-Pillow
-plotly
-ply
-PyQt6>=6.5
-qtawesome
-pymupdf
-python-vlc
-requests
-rispy
-six
-langchain>=0.2.8 
-langchain-community>=0.2.7 
-langchain-core>=0.2.19
-langchain-openai>=0.1.16
-langchain-text-splitters>=0.2.2 
-faiss-cpu
-transformers<=4.48.3 # see https://github.com/huggingface/transformers/issues/38402
-sentence-transformers 
-Bio
-PyYAML 
-json_repair
-pyinstaller<=6.4.0 
+--index-url https://sonpack.dbfz.de/repository/dbfz-pypi-group/simple
+chardet==5.2.0
+diff-match-patch==20241021
+EbookLib==0.20
+openpyxl==3.1.5
+pandas==2.3.3
+pdfminer.six==20260107
+Pillow==12.1.0
+plotly==6.5.1
+ply==3.11
+PyQt6==6.10.2
+qtawesome==1.4.0
+pymupdf==1.26.7
+python-vlc==3.0.21203
+requests==2.32.5
+rispy==0.9.0
+six==1.17.0
+langchain==1.2.3
+langchain-community==0.4.1
+langchain-core==1.2.7
+langchain-openai==1.1.7
+langchain-text-splitters==1.0.0
+faiss-cpu==1.13.2
+transformers==4.48.3 # see https://github.com/huggingface/transformers/issues/38402
+sentence-transformers==5.2.0
+Bio==1.8.1
+PyYAML==6.0.3
+json_repair==0.55.0
+pyinstaller==6.16.0 
 # The bootloader in the most recent version of pyinstaller is often falsely detected as malware
 # by anti virus software, so, it's safer to use a version that has been released a few months ago.
-pefile<2024.8.26  # see: https://github.com/pyinstaller/pyinstaller/issues/8832#issuecomment-2413203254
+pefile==2023.2.7  # see: https://github.com/pyinstaller/pyinstaller/issues/8832#issuecomment-2413203254
+torch==2.2.0 
